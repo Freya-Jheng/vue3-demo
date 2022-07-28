@@ -32,22 +32,15 @@ export default {
     getIndividualOwner({ id }) {
         return apiHelper.get(`/admin/user/super/${id}`);
     },
-    editIndividualOwner({ id, account, pwd, name, email, roleName }) {
+    editIndividualOwner({ id, userDTO, roleDTO }) {
         return apiHelper.put(`/admin/user/super/${id}`, {
-            account,
-            pwd,
-            name,
-            email,
-            roleName
+            userDTO,
+            roleDTO
         });
     },
-    addIndividualOwner({ account, pwd, name, email, roleName }) {
+    addIndividualOwner({ userDTO, roleDTO }) {
         return apiHelper.post('/admin/user/super', {
-            account,
-            pwd,
-            name,
-            email,
-            roleName
+            userDTO, roleDTO
         });
     },
     deleteIndividualOwner({ id }) {
