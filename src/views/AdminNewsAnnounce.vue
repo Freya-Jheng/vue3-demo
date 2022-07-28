@@ -1,16 +1,68 @@
 <template>
-    <form class="admin-home__content__news__announce">
-        <select name="" id="" class="admin-home__content__news__announce__category">
-            <option value="選擇消息分類">選擇消息分類</option>
-            <option value="婚姻">婚姻</option>
+    <form @submit.prevent.stop="addCamp()" class="admin-home__content__news__announce">
+        <select v-model="newCamp.campTagId" name="" id="" class="admin-home__content__news__announce__category">
+            <option value="">選擇消息分類</option>
+            <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{tag.tag}}</option>
         </select>
-        <input type="text" class="admin-home__content__news__announce__title" placeholder="標題">
-        <QuillEditor placeholder="請輸入內容..." theme="snow" toolbar="essential" style="height: 463px;" />
-        <div id="toolbar"></div>
-        <div id="editor"></div>
+        <div class="admin-home__content__news__announce__date">
+            <input v-model="newCamp.date" type="date">
+        </div>
+        <input type="text" v-model="newCamp.title" class="admin-home__content__news__announce__title" placeholder="標題">
+        <quill-editor v-model:content="newCamp.content" placeholder="請輸入內容..." theme="snow" toolbar="essential"
+            style="height: 463px;" class="quill" />
         <button type="submit">發布消息</button>
     </form>
 </template>
+
+<script setup>
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import campAPI from '../apis/camp';
+import { reactive } from 'vue';
+import { useGsFamily } from '../stores/gsfamily';
+const GsFamily = useGsFamily();
+GsFamily.getTags()
+
+const newCamp = reactive({
+    title: '',
+    campTagId: '',
+    date: '',
+    content: '',
+})
+
+// functions
+
+async function addCamp() {
+    try {
+        let re = /-/gi;
+        const quill = document.querySelector('.quill')
+        console.log(quill.textContent)
+        const response = await campAPI.addNewCamp({
+            title: newCamp.title,
+            campTagId: newCamp.campTagId,
+            date: newCamp.date.replace(re, '/'),
+            content: newCamp.content.ops[0].insert,
+        });
+
+        if (response.data.statusCodeValue !== 200) {
+            throw new Error(response.data.statusCode)
+        }
+
+        if(response.data.statusCodeValue === 200) {
+            alert('新增成功！請前往管理消息區瀏覽')
+        }
+
+        newCamp.campTagId = '';
+        newCamp.date = '';
+        newCamp.title = '';
+        quill.textContent = '';
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+
+</script>
 
 <style scoped lang="scss">
 .admin-home__content__news__announce {
@@ -23,7 +75,8 @@
     position: relative;
 
     select,
-    input[type='text'] {
+    input[type='text'],
+    input[type='date'] {
         width: 100%;
         height: 52px;
         border: 0.5px solid var(--input-icon-border);
@@ -47,20 +100,30 @@
         text-align: center;
         margin-top: 27px;
     }
+
+    input[type='date'] {
+        width: 100%;
+
+        &:focus-visible {
+            &::-webkit-datetime-edit-fields-wrapper {
+                opacity: 1;
+            }
+        }
+
+        &::-webkit-datetime-edit {
+            margin-left: 50px;
+        }
+
+        &::-webkit-calendar-picker-indicator {
+            position: absolute;
+            opacity: 1;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background-image: url('../assets/calender-icon.png');
+            cursor: pointer;
+        }
+    }
 }
 </style>
 
-<script setup>
-import { QuillEditor } from '@vueup/vue-quill';
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
-
-var quill = new Quill('#editor', {
-    modules: {
-        toolbar: {
-            container: '#toolbar',  // Selector for toolbar container
-            
-        }
-    }
-});
-
-</script>

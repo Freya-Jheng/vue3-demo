@@ -124,7 +124,7 @@ const items = reactive([
     },
     {
         id: '2',
-        title: '最新消息',
+        title: '最新營會',
         path: '/admin/home/news'
     },
     {

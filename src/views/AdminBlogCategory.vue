@@ -212,9 +212,6 @@ const lists = reactive([
 ])
 
 // functions
-function goIndividualBlog() {
-    router.push('individual-blog/1')
-}
 async function getArticles() {
     try {
         const response = await articlesAPI.getArticles();

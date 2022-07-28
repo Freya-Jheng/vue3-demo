@@ -121,11 +121,11 @@ import accountAPI from '../apis/accounts';
 
 const lists = reactive([]);
 const individualList = ref({
-    id: 'd',
-    account: 'd',
-    pwd: 'd',
-    checkedPwd: 'd',
-    remark: 'd'
+    id: '',
+    account: '',
+    pwd: '',
+    checkedPwd: '',
+    remark: ''
 });
 const newAccount = ref({
     account: '',
@@ -140,7 +140,7 @@ function modalResize() {
     let windowWidth = $(document.body).width();
     let width = (windowWidth - 800) / 2 + 'px';
     widthModal.value = width
-}
+};
 
 async function getTeachers() {
     try {
@@ -156,7 +156,7 @@ async function getTeachers() {
     } catch (err) {
         console.log(err)
     }
-}
+};
 
 async function getIndividual(id) {
     try {
@@ -176,7 +176,7 @@ async function getIndividual(id) {
     } catch (err) {
         console.log(err);
     }
-}
+};
 
 async function editIndividual(id) {
     try {
@@ -215,7 +215,7 @@ async function editIndividual(id) {
     } catch (err) {
         console.log(err);
     }
-}
+};
 
 async function addIndividual() {
     try {
@@ -253,7 +253,7 @@ async function addIndividual() {
     } catch (err) {
         console.log(err)
     }
-}
+};
 
 async function deleteIndividual(id) {
     try {
@@ -276,7 +276,7 @@ async function deleteIndividual(id) {
     } catch (err) {
         console.log(err);
     }
-}
+};
 
 getTeachers();
 

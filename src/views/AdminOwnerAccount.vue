@@ -28,7 +28,8 @@
                         <td>
                             <button type="button" @click="getIndividual(list.id), modalResize()" class="submit"
                                 data-toggle="modal" data-target="#ownerAccounts"></button>
-                            <button @click.prevent.stop="deleteIndividual(list.id)" type="submit" class="delete"></button>
+                            <button @click.prevent.stop="deleteIndividual(list.id)" type="submit"
+                                class="delete"></button>
                         </td>
                     </tr>
                 </tbody>
@@ -52,15 +53,19 @@
                             <span>帳號</span>
                             <input v-model="individualList.account" type="text">
                         </div>
-                        <div class="admin-teacher-account__edit-account__password input">
+                        <div class="admin-teacher-account__edit-account__name input">
                             <span>姓名</span>
                             <input v-model="individualList.name" type="text">
                         </div>
-                        <div class="admin-teacher-account__edit-account__checkpassword input">
+                        <div class="admin-teacher-account__edit-account__email input">
                             <span>E-mail</span>
                             <input v-model="individualList.email" type="email">
                         </div>
-                        <div class="admin-teacher-account__edit-account__remark input">
+                        <div class="admin-teacher-account__edit-account__password input">
+                            <span>密碼</span>
+                            <input v-model="individualList.pwd" type="password">
+                        </div>
+                        <div class="admin-teacher-account__edit-account__role input">
                             <span>權限</span>
                             <input v-model="individualList.roleName" type="text">
                         </div>
@@ -158,6 +163,7 @@ const individualList = ref({
     account: '',
     name: '',
     email: '',
+    pwd: '',
     roleName: [],
 });
 const newAccount = ref({
@@ -183,9 +189,6 @@ async function getOwners() {
         }
 
         lists.value = { ...response.data };
-        console.log(lists.value)
-
-        console.log(response.data)
 
     } catch (err) {
         console.log(err);
@@ -198,16 +201,15 @@ async function getIndividual(id) {
         if (response.status !== 200) {
             throw new Error(response.statusText);
         }
-        const { account, name, roleName, email } = response.data
+        const { account, name, roleName, email, pwd } = response.data
         individualList.value = {
             account,
             name,
             roleName,
             email,
+            pwd,
             id
         }
-
-        console.log(response.data)
 
     } catch (err) {
         console.log(err);
@@ -219,9 +221,9 @@ async function editIndividual() {
             return alert('請填寫資料')
         }
 
-        if (individualList.value.pwd !== individualList.value.checkedPwd) {
-            return alert('密碼與確認密碼不一樣！')
-        }
+        // if (individualList.value.pwd !== individualList.value.checkedPwd) {
+        //     return alert('密碼與確認密碼不一樣！')
+        // }
 
         const userDTO = {
             account: individualList.value.account,
@@ -232,21 +234,23 @@ async function editIndividual() {
         const roleDTO = {
             roleName: [individualList.value.roleName],
         }
+        console.log(userDTO, roleDTO, 'from editing')
 
-        const { data } = await accountAPI.editIndividualOwner({
+        const response = await accountAPI.editIndividualOwner({
             id: individualList.value.id,
             userDTO,
             roleDTO,
         })
 
-        console.log(userDTO, roleDTO, 'from editing')
+        console.log(userDTO, roleDTO, response, 'from editing')
 
-        if (data.statusCodeValue !== 200) {
+
+        if (response.status !== 200) {
             throw new Error(data.statusCode)
         }
 
-        if (data.statusCodeValue === 200) {
-            alert('修改成功！')
+        if (response.status === 200) {
+            alert('修改成功')
         }
 
         const response1 = await accountAPI.getOwnerAccount();
@@ -266,6 +270,7 @@ async function addIndividual() {
         if (!newAccount.value.account.trim() || !newAccount.value.pwd.trim() || !newAccount.value.name.trim() || !newAccount.value.email.trim()) {
             return alert('請填寫資料！')
         }
+      
         const userDTO = {
             account: newAccount.value.account,
             pwd: newAccount.value.pwd,
@@ -276,22 +281,16 @@ async function addIndividual() {
             roleName: [newAccount.value.roleName],
         }
 
-        console.log(userDTO, roleDTO)
-        
-
         const response = await accountAPI.addIndividualOwner({
             userDTO,
             roleDTO
         })  
 
-
-        console.log(response.data)
-
-        if (data.statusCodeValue !== 200) {
+        if (response.status !== 200) {
             throw new Error(data.statusCode)
         }
 
-        if (data.statusCodeValue === 200) {
+        if (response.status === 200) {
             alert('新增成功')
         }
 
@@ -472,7 +471,7 @@ getOwners()
 
 .modal-content {
     width: 800px;
-    height: 750px;
+    height: 800px;
 }
 
 .modal-header {
