@@ -5,17 +5,16 @@
                 <thead>
                     <tr>
                         <th scope="col">課程名稱</th>
-                        <th scope="col">課程類別</th>
-                        <th scope="col">檔案</th>
+                        <th scope="col">圖片</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="list in lists.value " :key="list.id">
+                    <tr v-for="list in lists " :key="list.id">
                         <td>{{ list.name }}</td>
                         <td>{{ list.category }}</td>
-                        <td>{{ list.idg}}</td>
                         <td>
-                            <button type="button" @click.prevent.stop="deleteCourse(list.id)"></button>
+                            <button type="button" class="save"></button>
+                            <button type="button" class="delete" @click.prevent.stop="deleteCourse(list.id)"></button>
                         </td>
                     </tr>
                 </tbody>
@@ -23,8 +22,7 @@
         </div>
         <input v-model="addStatus" type="checkbox" id="checkbox">
         <label for="checkbox"></label>
-        <form @submit.prevent.stop="addCourses" v-show="addStatus"
-        class=" admin-courses__add-videos">
+        <form @submit.prevent.stop="addCourses" v-show="addStatus" class=" admin-courses__add-videos">
             <div class="admin-courses__add-videos__name input">
                 <span>課程名稱</span>
                 <input v-model="currentCourse.name" type="text" name="" id="">
@@ -90,12 +88,47 @@
             border-bottom: 0.5px solid var(--input-icon-border);
         }
 
+        // button {
+        //     width: 92px;
+        //     height: 31px;
+        //     background: var(--button-bg-color);
+        //     border-radius: 5px;
+        //     position: relative;
+
+        //     &::after {
+        //         position: absolute;
+        //         top: 50%;
+        //         right: 50%;
+        //         transform: translate(50%, -50%);
+        //         content: '刪除';
+        //         color: var(--sub-font-color);
+        //     }
+        // }
+
         button {
             width: 92px;
             height: 31px;
-            background: var(--button-bg-color);
             border-radius: 5px;
+        }
+
+        .save {
             position: relative;
+            background: var(--button-bg-color);
+            margin-right: 10px;
+
+            &::after {
+                position: absolute;
+                top: 50%;
+                right: 50%;
+                transform: translate(50%, -50%);
+                content: '編輯';
+                color: var(--sub-font-color);
+            }
+        }
+
+        .delete {
+            position: relative;
+            background-color: var(--check-button-bg-color);
 
             &::after {
                 position: absolute;
@@ -201,53 +234,57 @@
 </style>
 
 <script setup>
-import { faListDots } from '@fortawesome/free-solid-svg-icons';
-import { list } from 'postcss';
 import { reactive, ref } from 'vue';
 import coursesAPI from '../apis/courses';
 
 const addStatus = ref(false);
 const currentCourse = reactive({
-    id:'',
+    id: '',
     name: '',
     category: '',
     file: ''
 })
-const lists = reactive([]);
+const lists = reactive([
+    {
+        id: 1,
+        name: 'test',
+        category: 'picture',
+    }
+]);
 
 // functions
 function cancelAdding() {
     addStatus.value = false;
 };
-function addCourse () {
+function addCourse() {
     lists.push(currentCourse);
 };
-function deleteCourse (id) {
+function deleteCourse(id) {
     lists.forEach((item, index) => {
         if (item.id === id) {
             lists.splice(index, 1);
         };
     });
 };
-function previewFile (e) {
+function previewFile(e) {
     currentCourse.file = e.target.files[0].name;
 };
-async function getCourses () {
+async function getCourses() {
     try {
         const response = await coursesAPI.getCourses();
 
         if (response.status !== 200) {
-            throw new Error (response.statusText);
+            throw new Error(response.statusText);
         }
         lists.value = response.data;
-        
+
     } catch (err) {
         console.log(err)
     }
 }
-async function addCourses (name, file) {
+async function addCourses(name, file) {
     try {
-        if(!currentCourse.name || !currentCourse.file ) {
+        if (!currentCourse.name || !currentCourse.file) {
             return alert('請輸入資料')
         }
 
@@ -258,13 +295,13 @@ async function addCourses (name, file) {
 
         console.log(response)
 
-        if (response.status !== 200){
-            throw new Error (response.statusText)
+        if (response.status !== 200) {
+            throw new Error(response.statusText)
         }
 
     } catch (err) {
         console.log(err);
     }
 }
-getCourses()
+// getCourses()
 </script>

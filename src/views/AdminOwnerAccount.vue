@@ -28,7 +28,7 @@
                         <td>
                             <button type="button" @click="getIndividual(list.id), modalResize()" class="submit"
                                 data-toggle="modal" data-target="#ownerAccounts"></button>
-                            <button type="submit" class="delete"></button>
+                            <button @click.prevent.stop="deleteIndividual(list.id)" type="submit" class="delete"></button>
                         </td>
                     </tr>
                 </tbody>
@@ -185,6 +185,8 @@ async function getOwners() {
         lists.value = { ...response.data };
         console.log(lists.value)
 
+        console.log(response.data)
+
     } catch (err) {
         console.log(err);
     }
@@ -205,6 +207,8 @@ async function getIndividual(id) {
             id
         }
 
+        console.log(response.data)
+
     } catch (err) {
         console.log(err);
     }
@@ -218,15 +222,24 @@ async function editIndividual() {
         if (individualList.value.pwd !== individualList.value.checkedPwd) {
             return alert('密碼與確認密碼不一樣！')
         }
-        console.log(individualList.value.id)
-        const { data } = await accountAPI.editIndividualOwner({
-            id: individualList.value.id,
+
+        const userDTO = {
             account: individualList.value.account,
             pwd: individualList.value.pwd,
-            name: individualList.value.remark,
+            name: individualList.value.name,
             email: individualList.value.email,
-            roleName: individualList.value.roleName
+        }
+        const roleDTO = {
+            roleName: [individualList.value.roleName],
+        }
+
+        const { data } = await accountAPI.editIndividualOwner({
+            id: individualList.value.id,
+            userDTO,
+            roleDTO,
         })
+
+        console.log(userDTO, roleDTO, 'from editing')
 
         if (data.statusCodeValue !== 200) {
             throw new Error(data.statusCode)
@@ -263,14 +276,16 @@ async function addIndividual() {
             roleName: [newAccount.value.roleName],
         }
 
-        console.log(roleDTO, userDTO);
+        console.log(userDTO, roleDTO)
+        
 
         const response = await accountAPI.addIndividualOwner({
             userDTO,
-            roleDTO,
+            roleDTO
         })  
 
-        console.log(response)
+
+        console.log(response.data)
 
         if (data.statusCodeValue !== 200) {
             throw new Error(data.statusCode)
@@ -290,6 +305,28 @@ async function addIndividual() {
 
     } catch (err) {
         console.log(err)
+    }
+};
+async function deleteIndividual(id) {
+    try {
+        const response = await accountAPI.deleteIndividualOwner({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        }
+
+        alert('刪除成功')
+
+        const response1 = await accountAPI.getOwnerAccount();
+
+        if (response1.status !== 200) {
+            throw new Error(response1.statusText);
+        };
+
+        lists.value = { ...response1.data };
+
+    } catch (err) {
+        console.log(err);
     }
 }
 getOwners()

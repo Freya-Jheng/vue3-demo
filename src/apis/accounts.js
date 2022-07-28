@@ -37,9 +37,10 @@ export default {
             userDTO, roleDTO
         });
     },
-    addIndividualOwner({ userDTO, roleDTO }) {
+    addIndividualOwner({ userDTO,roleDTO }) {
         return apiHelper.post('/admin/user/super', {
-            userDTO, roleDTO,
+            userDTO,
+            roleDTO
         });
     },
     deleteIndividualOwner({ id }) {

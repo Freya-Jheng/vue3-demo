@@ -119,7 +119,7 @@ const router = useRouter();
 const items = reactive([
     {
         id: '1',
-        title: '部落格貼文',
+        title: '好文分享',
         path: '/admin/home/blog'
     },
     {
@@ -129,12 +129,12 @@ const items = reactive([
     },
     {
         id: '3',
-        title: '參加營會',
+        title: '影片管理',
         path: '/admin/home/camp'
     },
     {
         id: '4',
-        title: '合作申辦',
+        title: '表單申請',
         path: '/admin/home/cooperate'
     },
     {
@@ -144,7 +144,7 @@ const items = reactive([
     },
     {
         id: '6',
-        title: '外來聯繫管理',
+        title: '聯絡我們',
         path: '/admin/home/contact'
     },
     {
