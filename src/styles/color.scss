@@ -1,0 +1,67 @@
+$black-00: #000000;
+$orange-D3: #D37E5F;
+$white-ff: #ffffff;
+$grey-6D: #6D6D6D;
+$grey-B5: #B5B5B5;
+$grey-F8: #F8F8F8; 
+$orange-EB: #EB8B69;
+$orange-F2: #F2AB90;
+$brown-CF: #CFAD98;
+$black-42: #42413E;
+$black-04: #040404;
+$grey-C8: #C8BFBA;
+$black-37: #373737;
+$yellow-C9: #C9B197;
+$grey-C4: #C4C4C4;
+$grey-BB: #BBBBBB;
+$pink-FF: #FFECE6;
+$yellow-FC: #FCF4ED;
+$white-DD: #DDDDDD;
+$grey-B7: #B7B7B7;
+
+
+
+:root {
+    --main-font-color: #{$black-00};
+    --sub-font-color: #{$white-ff};
+    --circle-border-color: #{$white-ff};
+    --button-color: #{$orange-D3};
+    --circle-bg-color: #{$orange-D3};
+    --button-border: #{$orange-F2};
+    --input-border: #{$grey-6D};
+    --select-color: #{$grey-6D};
+    --input-icon-border: #{$grey-B5};
+    --button-bg-color: #{$orange-EB};
+    --admin-nav-item-bg-color: #{$orange-EB};
+    --hover-bg-color: #{$orange-EB};
+    --table-font-color: #{$orange-EB};
+    --circle-bg-color-hover: #{$brown-CF};
+    --footer-font-color: #{$black-42};
+    --footer-line-border: #{$grey-C8};
+    --page-font-color: #{$yellow-C9};
+    --news-line-color: #{$yellow-C9};
+    --story-button-color: #{$yellow-C9};
+    --poster-button-color: #{$yellow-C9};
+    --page-font-focus-color: #{$black-37};
+    --input-border-color: #{$black-37};
+    --news-title-color: #{$orange-D3};
+    --news-English-title-color: #{$black-42};
+    --story-bg-color: #{$grey-F8};
+    --section-bg-color: #{$grey-F8};
+    --videos-bg-color: #{$grey-F8};
+    --camp-title-color: #{$black-42};
+    --contact-title-color: #{$black-42};
+    --poster-title-color: #{$black-42};
+    --camp-subtitle-color: #{$orange-D3};
+    --subtitle-color: #{$orange-D3};
+    --admin-login-title-color: #{$orange-D3};
+    --icon-color: #{$orange-D3};
+    --structure-border-color: #{$orange-D3};
+    --sub-num-color: #{$grey-C4};
+    --border-color: #{$grey-BB};
+    --poster-hover-bg: #{$pink-FF};
+    --poster-sub-title: #{$black-04};
+    --admin-navbar-bg: #{$yellow-FC};
+    --admin-blog-box-bg: #{$white-DD};
+    --check-button-bg-color: #{$grey-B7};
+}
