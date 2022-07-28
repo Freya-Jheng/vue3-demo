@@ -12,8 +12,8 @@
                         <th scope="col">日期</th>
                         <th scope="col">姓名</th>
                         <th scope="col">電話</th>
-                        <!-- <th scope="col">內容</th>
-                        <th scope="col">附件</th> -->
+                        <th scope="col">內容</th>
+                        <th scope="col">附件</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -21,8 +21,8 @@
                         <td>{{ list.date }}</td>
                         <td>{{ list.name }}</td>
                         <td>{{ list.phone }}</td>
-                        <!-- <td>{{ list.name }}</td>
-                        <td>{{ list.name }}</td> -->
+                        <td>{{ list.name }}</td>
+                        <td>{{ list.name }}</td>
                         <td>
                             <router-link :to="{ name: 'admin-individual-contact',params: {id: list.name}}">
                                 <button type="button"></button>
@@ -119,25 +119,27 @@ import { reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import contactAPI from '../apis/contact';
 
-const route = useRoute()
+const route = useRoute();
 const lists = reactive([]);
 
 // funcitons
-// async function getContacts () {
-//     try {
-//         const response = await contactAPI.get();
+async function getContacts () {
+    try {
+        const response = await contactAPI.get();
 
-//         if (response.status !== 200) {
-//             throw new Error (response.statusText);
-//         };
+        if (response.status !== 200) {
+            throw new Error (response.statusText);
+        };
 
-//         lists.value = {...response.data};
+        console.log(response)
+
+        // lists.value = {...response.data};
         
-//         console.log('response from contact',lists.value);
-//     } catch (err) {
-//         console.log(err);
-//     }   
-// }
+        // console.log('response from contact',lists.value);
+    } catch (err) {
+        console.log(err);
+    }   
+}
 
-// getContacts()
+getContacts()
 </script>

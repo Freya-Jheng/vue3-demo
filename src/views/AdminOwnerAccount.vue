@@ -158,13 +158,13 @@ const individualList = ref({
     account: '',
     name: '',
     email: '',
-    roleName: '',
+    roleName: [],
 });
 const newAccount = ref({
     account: '',
     name: '',
     email: '',
-    roleName: '',
+    roleName: [],
     pwd: '',
 });
 
@@ -253,13 +253,6 @@ async function addIndividual() {
         if (!newAccount.value.account.trim() || !newAccount.value.pwd.trim() || !newAccount.value.name.trim() || !newAccount.value.email.trim()) {
             return alert('請填寫資料！')
         }
-        // const { data } = await accountAPI.addIndividualOwner({
-        //     account: newAccount.value.account,
-        //     pwd: newAccount.value.pwd,
-        //     name: newAccount.value.name,
-        //     email: newAccount.value.email,
-        //     roleName: newAccount.value.roleName
-        // })
         const userDTO = {
             account: newAccount.value.account,
             pwd: newAccount.value.pwd,
@@ -267,16 +260,17 @@ async function addIndividual() {
             email: newAccount.value.email,
         }
         const roleDTO = {
-            roleName: newAccount.value.roleName,
+            roleName: [newAccount.value.roleName],
         }
 
-        console.log(userDTO, roleDTO)
-        const { data } = await accountAPI.addIndividualOwner({
-            userDTO,
-            roleDTO
-        })
+        console.log(roleDTO, userDTO);
 
-        console.log(data)
+        const response = await accountAPI.addIndividualOwner({
+            userDTO,
+            roleDTO,
+        })  
+
+        console.log(response)
 
         if (data.statusCodeValue !== 200) {
             throw new Error(data.statusCode)

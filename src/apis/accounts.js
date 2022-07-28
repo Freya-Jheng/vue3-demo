@@ -34,13 +34,12 @@ export default {
     },
     editIndividualOwner({ id, userDTO, roleDTO }) {
         return apiHelper.put(`/admin/user/super/${id}`, {
-            userDTO,
-            roleDTO
+            userDTO, roleDTO
         });
     },
     addIndividualOwner({ userDTO, roleDTO }) {
         return apiHelper.post('/admin/user/super', {
-            userDTO, roleDTO
+            userDTO, roleDTO,
         });
     },
     deleteIndividualOwner({ id }) {
