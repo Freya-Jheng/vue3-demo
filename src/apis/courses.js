@@ -8,6 +8,6 @@ export default {
         return apiHelper.post('admin/curriculum', {
             name,
             file
-        });
+        }); 
     },
 }

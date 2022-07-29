@@ -13,7 +13,6 @@ export const useGsFamily = defineStore('GsFamily', {
       try {
         const response = await campAPI.getAllTags();
         this.campTags = response.data
-        console.log(this.campTags);
       } catch (err) {
         console.log(err)
       }

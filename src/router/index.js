@@ -179,7 +179,24 @@ const router = createRouter({
         {
           path: 'cooperate',
           name: 'cooperate',
-          component: () => import('../views/AdminCooperate.vue')
+          component: () => import('../views/AdminCooperate.vue'),
+          children: [
+            {
+              path: 'individual',
+              name: 'cooperate-individual',
+              component: () => import('../views/AdminIndividualCooperation.vue')
+            },
+            {
+              path: 'team',
+              name: 'cooperate-team',
+              component: () => import('../views/AdminTeamCooperation.vue')
+            },
+            {
+              path: 'church',
+              name: 'cooperate-church',
+              component: () => import('../views/AdminChurchCooperation.vue')
+            },
+          ]
         },
         {
           path: 'account',

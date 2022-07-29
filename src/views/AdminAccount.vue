@@ -104,52 +104,5 @@
             text-align: center;
         }
     }
-
-    // select,
-    // input {
-    //     width: 493px;
-    //     height: 52px;
-    //     border: 0.5px solid var(--input-icon-border);
-    //     border-radius: 5px;
-    //     font-size: 14px;
-    //     line-height: 19px;
-    //     letter-spacing: 0.06em;
-    //     color: var(--select-color);
-    //     padding-left: 15px;
-    // }
-
-    // input {
-    //     width: 1003px;
-    // }
-
-    // .input {
-    //     display: flex;
-    //     flex-direction: column;
-    //     gap: 10px;
-    //     margin-top: 23px;
-
-    //     span {
-    //         margin-left: 15px;
-    //     }
-    // }
-
-    // &__search {
-    //     display: flex;
-    //     flex-direction: row;
-    //     gap: 17px;
-    // }
-
-    // button {
-    //     position: absolute;
-    //     right: 50%;
-    //     transform: translateX(50%);
-    //     width: 237px;
-    //     height: 51px;
-    //     background: var(--button-bg-color);
-    //     border-radius: 5px;
-    //     color: var(--sub-font-color);
-    //     text-align: center;
-    //     margin-top: 43px;
-    // }
 }
 </style>

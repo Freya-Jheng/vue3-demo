@@ -1,10 +1,5 @@
 <template>
     <div class="admin-contact">
-        <select name="" id="" class="admin-contact__sort">
-            <option value="選擇排列方式">選擇排列方式</option>
-            <option value="依照時間">依照時間</option>
-            <option value="依照檔案大小">依照檔案大小</option>
-        </select>
         <div class="admin-contact__display">
             <table class="admin-contact__display__table table-hover">
                 <thead>
@@ -21,12 +16,15 @@
                         <td>{{ list.date }}</td>
                         <td>{{ list.name }}</td>
                         <td>{{ list.phone }}</td>
-                        <td>{{ list.name }}</td>
-                        <td>{{ list.name }}</td>
+                        <td>{{ list.content }}</td>
+                        <td
+                            @click.prevent.stop="base64ToArrayBuffer(list.file), saveByteArray('contactFile', fileBytes.value)">
+                            <font-awesome-icon class="download" v-show="list.file.length > 0"
+                                :icon="['fas', 'download']" />
+                            <span v-show="list.file.length <= 0" >no file</span>
+                        </td>
                         <td>
-                            <router-link :to="{ name: 'admin-individual-contact',params: {id: list.name}}">
-                                <button type="button"></button>
-                            </router-link>
+                            <button @click.prevent.stop="deleteContacts(list.id)" type="button"></button>
                         </td>
                     </tr>
                 </tbody>
@@ -46,24 +44,10 @@
     color: var(--select-color);
     position: relative;
 
-    select {
-        width: 999px;
-        height: 52px;
-        border: 0.5px solid var(--input-icon-border);
-        border-radius: 5px;
-        padding-left: 17px;
-        line-height: 52px;
-        cursor: pointer;
-        font-size: 14px;
-        line-height: 19px;
-        letter-spacing: 0.06em;
-        color: var(--select-color);
-    }
-
     &__display {
         width: 100%;
         max-width: 1000px;
-        margin-top: 73px;
+        margin-top: 100px;
 
         table {
             width: 100%;
@@ -94,6 +78,10 @@
             border-bottom: 0.5px solid var(--input-icon-border);
         }
 
+        .download {
+            cursor: pointer;
+        }
+
         button {
             width: 92px;
             height: 31px;
@@ -106,7 +94,7 @@
                 top: 50%;
                 right: 50%;
                 transform: translate(50%, -50%);
-                content: '檢視';
+                content: '刪除';
                 color: var(--sub-font-color);
             }
         }
@@ -115,30 +103,59 @@
 </style>
 
 <script setup>
-import { reactive } from 'vue';
-import { useRoute } from 'vue-router';
+import { reactive, ref } from 'vue';
 import contactAPI from '../apis/contact';
 
-const route = useRoute();
 const lists = reactive([]);
+const fileBytes = ref('');
 
 // funcitons
-async function getContacts () {
+function base64ToArrayBuffer(base64) {
+    let binaryString = window.atob(base64);
+    let binaryLen = binaryString.length;
+    let bytes = new Uint8Array(binaryLen);
+    for (var i = 0; i < binaryLen; i++) {
+        var ascii = binaryString.charCodeAt(i);
+        bytes[i] = ascii;
+    }
+    fileBytes.value = bytes;
+
+}
+function saveByteArray(reportName, byte) {
+    var blob = new Blob([byte], { type: "application/pdf" });
+    var link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    var fileName = reportName;
+    link.download = fileName;
+    link.click();
+};
+async function getContacts() {
     try {
         const response = await contactAPI.get();
 
         if (response.status !== 200) {
-            throw new Error (response.statusText);
+            throw new Error(response.statusText);
         };
+        lists.value = { ...response.data };
 
-        console.log(response)
-
-        // lists.value = {...response.data};
-        
-        // console.log('response from contact',lists.value);
     } catch (err) {
         console.log(err);
-    }   
+    }
+};
+
+async function deleteContacts(id) {
+    try {
+        const response = await contactAPI.deleteContact({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else if (response.status === 200) {
+            alert('確定刪除？')
+        };
+
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 getContacts()

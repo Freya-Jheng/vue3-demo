@@ -135,7 +135,7 @@ const items = reactive([
     {
         id: '4',
         title: '表單申請',
-        path: '/admin/home/cooperate'
+        path: '/admin/home/cooperate/individual'
     },
     {
         id: '5',

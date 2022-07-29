@@ -8,7 +8,7 @@
             <input v-model="newCamp.date" type="date">
         </div>
         <input type="text" v-model="newCamp.title" class="admin-home__content__news__announce__title" placeholder="標題">
-        <quill-editor v-model:content="newCamp.content" placeholder="請輸入內容..." theme="snow" toolbar="essential"
+        <quill-editor v-model:content="newCamp.content" content-type="text" placeholder="請輸入內容..." theme="snow" toolbar="essential"
             style="height: 463px;" class="quill" />
         <button type="submit">發布消息</button>
     </form>
@@ -36,12 +36,11 @@ async function addCamp() {
     try {
         let re = /-/gi;
         const quill = document.querySelector('.quill')
-        console.log(quill.textContent)
         const response = await campAPI.addNewCamp({
             title: newCamp.title,
             campTagId: newCamp.campTagId,
             date: newCamp.date.replace(re, '/'),
-            content: newCamp.content.ops[0].insert,
+            content: newCamp.content,
         });
 
         if (response.data.statusCodeValue !== 200) {

@@ -3,7 +3,7 @@
         <div class="admin-home__content__news__management__search">
             <select name="" id="" class="admin-home__content__news__management__search__category">
                 <option value="選擇消息分類">選擇營會類別</option>
-                <option value="婚姻">婚姻</option>
+                <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{tag.tag}}</option>
             </select>
             <button type="button" class="admin-home__content__news__management__search__button">
                 <img src="../assets/search-icon-white.png" alt="search"
@@ -57,8 +57,8 @@
                         </div>
                         <input type="text" v-model="editCamp.title" class="admin-home__content__news__announce__title"
                             placeholder="標題">
-                        <quill-editor v-model:content="editCamp.content" placeholder="請輸入內容..." theme="snow"
-                            toolbar="essential" style="height: 463px;" class="quill" />
+                        <quill-editor id="editor" v-model:content="test" content-type="text" placeholder="請輸入內容..."
+                            theme="snow" toolbar="essential" style="height: 463px;" class="quill" />
                         <button type="submit">儲存</button>
                     </form>
                 </div>
@@ -76,7 +76,8 @@ import { ref, reactive } from 'vue';
 import campAPI from '../apis/camp';
 import { useGsFamily } from '../stores/gsfamily';
 const GsFamily = useGsFamily();
-GsFamily.getTags()
+GsFamily.getTags();
+
 
 const lists = reactive([]);
 const widthModal = ref('');
@@ -87,7 +88,8 @@ const editCamp = ref({
     campTagId:'',
     date: '',
     content: '',
-})
+});
+const test = ref('sss');
 
 // functions
 function modalResize() {
@@ -135,27 +137,23 @@ async function deleteCamp(id) {
 
 async function getCamp(campId) {
     try {
-        let re = /-/gi;
-        const quill = document.querySelector('.quill');
         const response = await campAPI.getIndividualCamp({ campId });
-
+        
         if (response.status !== 200) {
             throw new Error (response.status);
         };
-
+        const quill = document.querySelector('.quill');
         const {id, title, content, campTag, date} = response.data;
-
+      
         editCamp.value = {
             id,
             title,
             content,
             campId: campTag.id,
             campTagId: campTag.tag,
-            date,
+            date: date.replaceAll("/", "-")
         }
 
-        console.log(response.data)
-        console.log(editCamp.value)
     } catch(err) {
         console.log(err);
     }
