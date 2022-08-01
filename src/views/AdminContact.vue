@@ -119,7 +119,6 @@ function base64ToArrayBuffer(base64) {
         bytes[i] = ascii;
     }
     fileBytes.value = bytes;
-
 }
 function saveByteArray(reportName, byte) {
     var blob = new Blob([byte], { type: "application/pdf" });

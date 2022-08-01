@@ -59,8 +59,6 @@ async function addCamp() {
         console.log(err);
     }
 };
-
-
 </script>
 
 <style scoped lang="scss">

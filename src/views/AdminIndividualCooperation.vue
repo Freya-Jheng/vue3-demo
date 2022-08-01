@@ -37,37 +37,23 @@
 <script setup>
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import cooperateAPI from '../apis/cooperate';
 
 const router = useRouter();
-const lists = reactive([
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    },
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    },
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
+const lists = reactive([]);
+
+// functions
+async function getIndividuals () {
+    try {
+        const response = await cooperateAPI.getAllIndividual();
+
+        console.log(response);
+    } catch (err) {
+        console.log(err);
     }
-])
+};
+
+getIndividuals();
 </script>
 
 

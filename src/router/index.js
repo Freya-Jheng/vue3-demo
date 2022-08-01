@@ -116,14 +116,14 @@ const router = createRouter({
               component: () => import('../views/AdminBlogMenu.vue')
             },
             {
+              path: 'lists',
+              name: 'blog-list',
+              component: () => import('../views/AdminBlogList.vue')
+            },
+            {
               path: 'categories',
               name: 'blog-categories',
               component: () => import('../views/AdminBlogCategory.vue')
-            },
-            {
-              path: 'individual-blog/:id',
-              name: 'individual-blog',
-              component: () => import('../views/AdminIndividualBlog.vue')
             }
           ]
         },
