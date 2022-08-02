@@ -76,9 +76,13 @@
                     class="app__home__nav__left__specials__church">
                     教會專區
                 </button>
-                <button data-toggle="modal" data-target="#teacherModal" type="button"
+                <button v-if="route.name !== 'courses'" data-toggle="modal" data-target="#teacherModal" type="button"
                     class="app__home__nav__left__specials__teacher">
                     師資專區
+                </button>
+                <button @click.prevent.stop="frontLogout()" v-else="route.name === 'courses'" type="button"
+                    class="app__home__nav__left__specials__teacher">
+                    登出
                 </button>
             </div>
         </div>
@@ -110,7 +114,7 @@
     <div class="modal fade" id="teacherModal" tabindex="-1" aria-labelledby="teachaerModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="teacher-modal__content modal-body">
+                <form @submit.prevent.stop="frontLogin" class="teacher-modal__content modal-body">
                     <div class="teacher-modal__content__header">
                         <span class="teacher-modal__content__header__text">
                             師資專區
@@ -120,27 +124,84 @@
                         <div class="teacher-modal__content__inputs__account">
                             <img src="../assets/account.png" alt="account"
                                 class="teacher-modal__content__inputs__account__image">
-                            <input type="text" placeholder="帳號" class="teacher-modal__content__inputs__account__input">
+                            <input type="text" placeholder="帳號" class="teacher-modal__content__inputs__account__input"
+                                v-model="teacherLogin.account">
                         </div>
                         <div class="teacher-modal__content__inputs__password">
                             <img src="../assets/password.png" alt="password"
                                 class="teacher-modal__content__inputs__password__image">
-                            <input type="text" placeholder="密碼" class="teacher-modal__content__inputs__password__input">
+                            <input type="password" placeholder="密碼"
+                                class="teacher-modal__content__inputs__password__input" v-model="teacherLogin.password">
                         </div>
                     </div>
                     <div class="teacher-modal__content__footer">
-                        <router-link to="/home/courses">
-                            <button type="submit" data-dismiss="modal" class="btn">登入
-                                <img class="arrow" src="../assets/arrow.png" alt="">
-                            </button>
-                        </router-link>
+                        <button type="submit" class="btn">登入
+                            <img class="arrow" src="../assets/arrow.png" alt="">
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
     <!-- teacher modal end -->
 </template>
+
+<script setup>
+import { reactive, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import authorizationAPI from '../apis/authorlization';
+
+let color = 'color: #000000'
+const router = useRouter();
+const route = useRoute();
+const teacherLogin = reactive({
+    account: '',
+    password: '',
+});
+// functions
+async function frontLogin() {
+    try {
+        if(!teacherLogin.account.trim() || !teacherLogin.password.trim() ) {
+            return alert('請輸入帳號密碼！')
+        }
+
+        const modalBackdrop = document.querySelector('.modal-backdrop');
+        const modal = document.querySelector('#teacherModal');
+        const response = await authorizationAPI.logIn({
+            account: teacherLogin.account,
+            password: teacherLogin.password,
+        });
+        
+        localStorage.setItem('token', response.data);
+        modal.remove();
+        modalBackdrop.remove();
+        router.push({ name:'courses'});
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+async function frontLogout() {
+    try {
+        const response = await authorizationAPI.logOut();
+        if (response.status !== 200) {
+            console.log(response)
+            throw new Error(response.data.message);
+        };
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        localStorage.removeItem('token');
+        router.back(-1);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+</script>
+
 <style lang="scss" scoped>
 .app__home__nav {
     width: 100%;
@@ -557,9 +618,3 @@
 
 // teacher modal end
 </style>
-<script setup>
-import { useRoute } from 'vue-router'
-
-let color = 'color: #000000'
-const route = useRoute()
-</script>

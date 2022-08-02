@@ -5,7 +5,7 @@ export default {
         return apiHelper.get('/admin/camp');
     },
     addNewCamp({ title, campTagId, date, content }) {
-        return apiHelper.post('/admin/camp', {
+        return apiHelper.post('/backend/admin/camp', {
             title,
             campTagId,
             date,
@@ -13,20 +13,20 @@ export default {
         });
     },
     deleteCamp({id}) {
-        return apiHelper.delete(`/admin/camp/${id}`);
+        return apiHelper.delete(`/backend/admin/camp/${id}`);
     },
     getIndividualCamp({ campId }) {
-        return apiHelper.get(`/admin/camp/${campId}`);
+        return apiHelper.get(`/backend/admin/camp/${campId}`);
     },
     // tag
     getAllTags() {
-        return apiHelper.get('/admin/camp/tag');
+        return apiHelper.get('/backend/admin/camp/tag');
     },
     getTag({id}) {
-        return apiHelper.get(`/admin/camp/tag/${id}`);
+        return apiHelper.get(`/backend/admin/camp/tag/${id}`);
     },
     addTag({tag}) {
-        return apiHelper.post('/admin/camp/tag', {
+        return apiHelper.post('/backend/admin/camp/tag', {
             tag
         });
     },

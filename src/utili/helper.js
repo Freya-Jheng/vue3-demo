@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'http://139.162.85.127:8080/backend';
+const baseURL = 'http://139.162.85.127:8080';
 
 const axiosInstance = axios.create({
     baseURL,
@@ -20,3 +20,4 @@ axiosInstance.interceptors.request.use(
 )
 
 export const apiHelper = axiosInstance;
+export const frontAPIHelper = axiosInstance;

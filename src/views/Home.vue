@@ -98,6 +98,10 @@
 <style scoped lang="scss">
 .landing {
   width: 100%;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
   // command styles for title start
   .title {
     position: relative;

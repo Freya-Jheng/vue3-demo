@@ -26,6 +26,35 @@
     </div>
 </template>
 
+<script setup>
+import Searchbar from '../components/Searchbar.vue';
+import Pagination from '../components/Pagination.vue';
+import { reactive } from 'vue';
+import { useGsFamily } from '../stores/gsfamily';
+const GsFamily = useGsFamily();
+GsFamily.getAllFrontVideos();
+
+let id = 0;
+const videos = reactive([
+    {
+        id: id++,
+        title: '好僕人宣傳影片',
+    },
+    {
+        id: id++,
+        title: '好僕人宣傳影片',
+    },
+    {
+        id: id++,
+        title: '好僕人宣傳影片',
+    },
+    {
+        id: id++,
+        title: '好僕人宣傳影片',
+    },
+])
+</script>
+
 <style lang="scss" scoped>
 .videos {
     width: 100%;
@@ -225,29 +254,3 @@
     }
 }
 </style>
-
-<script setup>
-import Searchbar from '../components/Searchbar.vue';
-import Pagination from '../components/Pagination.vue';
-import { reactive } from 'vue';
-
-let id = 0;
-const videos = reactive([
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-])
-</script>

@@ -23,28 +23,28 @@ export default {
         });
     },
     deleteIndividualTeacher({ id }) {
-        return apiHelper.delete(`/admin/user/general/${id}`)
+        return apiHelper.delete(`/backend/admin/user/general/${id}`)
     },
     // owner
     getOwnerAccount() {
-        return apiHelper.get('/admin/user/super');
+        return apiHelper.get('/backend/admin/user/super');
     },
     getIndividualOwner({ id }) {
-        return apiHelper.get(`/admin/user/super/${id}`);
+        return apiHelper.get(`/backend/admin/user/super/${id}`);
     },
     editIndividualOwner({ id, userDTO, roleDTO }) {
-        return apiHelper.put(`/admin/user/super/${id}`, {
+        return apiHelper.put(`/backend/admin/user/super/${id}`, {
             userDTO,
             roleDTO
         });
     },
     addIndividualOwner({ userDTO,roleDTO }) {
-        return apiHelper.post('/admin/user/super', {
+        return apiHelper.post('/backend/admin/user/super', {
             userDTO,
             roleDTO
         });
     },
     deleteIndividualOwner({ id }) {
-        return apiHelper.delete(`/admin/user/super/${id}`)
+        return apiHelper.delete(`/backend/admin/user/super/${id}`)
     },
 }

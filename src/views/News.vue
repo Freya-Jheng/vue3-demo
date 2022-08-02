@@ -8,24 +8,33 @@
         </div>
         <NavTab />
         <div class="news__content">
-            <div v-for="story in stories" :key="story.id" class="news__content__card">
+            <div v-for="camp in GsFamily.frontCamps" :key="camp.id" class="news__content__card">
                 <div class="news__content__card__left">
                     <span class="news__content__card__left__number">
-                        <span v-if="story.id < 10">0</span>{{ story.id }}
+                        <span v-if="camp.id < 10">0</span>{{ camp.id }}
                     </span>
                 </div>
                 <div class="news__content__card__right">
                     <span class="news__content__card__right__title">
-                        {{ story.title }}
+                        {{ camp.title }}
                     </span>
-                    <span class="news__content__card__right__details">{{ story.time }}<span>{{ story.city
-                    }}</span></span>
+                    <span class="news__content__card__right__details">{{ camp.date }}<span>{{ camp.place
+                            }}</span></span>
                 </div>
             </div>
         </div>
         <Pagination />
     </div>
 </template>
+
+<script setup>
+import NavTab from '../components/NavTab.vue'
+import Pagination from '../components/Pagination.vue'
+import { reactive } from 'vue';
+import {useGsFamily} from '../stores/gsfamily';
+const GsFamily = useGsFamily();
+GsFamily.getAllFrontCamps();
+</script>
 
 <style lang="scss" scoped>
 .news {
@@ -103,103 +112,59 @@
             max-height: 61px;
             display: flex;
             flex-direction: row;
-            color: var(--news-title-color);
-
-            &__left {
-                font-size: 0.78rem;
-                font-weight: 600;
-                @media (min-width: 768px) {
-                    font-size: 1.125rem;
-                }
-
-                &__number {
-                    position: relative;
-                    margin-right: 57px;
-                    &::after {
-                        position: absolute;
-                        content: '';
-                        top: 140%;
-                        right: 50%;
-                        transform: translateX(50%);
-                        width: 0px;
-                        height: 30px;
-                        border: 0.5px solid var(--news-line-color);
-                    }
-                }
-            }
-
-            &__right {
-                display: flex;
-                flex-direction: column;
-
-                &__title {
-                    font-size: 0.88rem;
+                color: var(--news-title-color);
+            
+                &__left {
+                    font-size: 0.78rem;
                     font-weight: 600;
-                    margin-bottom: 4px;
-
+            
                     @media (min-width: 768px) {
                         font-size: 1.125rem;
                     }
-                }
-
-                &__details {
-                    font-size: 0.75rem;
-                    font-weight: 300;
-                    color: var(--main-font-color);
-
-                    @media (min-width: 768px) {
-                        font-size: 0.8125rem;
+            
+                    &__number {
+                        position: relative;
+                        margin-right: 57px;
+            
+                        &::after {
+                            position: absolute;
+                            content: '';
+                            top: 140%;
+                            right: 50%;
+                            transform: translateX(50%);
+                            width: 0px;
+                            height: 30px;
+                            border: 0.5px solid var(--news-line-color);
+                        }
                     }
                 }
-
+            
+                &__right {
+                    display: flex;
+                    flex-direction: column;
+            
+                    &__title {
+                        font-size: 0.88rem;
+                        font-weight: 600;
+                        margin-bottom: 4px;
+            
+                        @media (min-width: 768px) {
+                            font-size: 1.125rem;
+                        }
+                    }
+            
+                    &__details {
+                        font-size: 0.75rem;
+                        font-weight: 300;
+                        color: var(--main-font-color);
+            
+                        @media (min-width: 768px) {
+                            font-size: 0.8125rem;
+                        }
+                    }
+            
+                }
             }
-        }
-    }
-}
+            }
+            }
 </style>
-
-<script setup>
-import NavTab from '../components/NavTab.vue'
-import Pagination from '../components/Pagination.vue'
-import { reactive } from 'vue';
-
-let id = 1
-const stories = reactive([
-    {
-        id: id++,
-        title: '愛在家夫婦日營',
-        time: '2021.10.30',
-        city: '台中'
-    },
-    {
-        id: id++,
-        title: '愛在家夫婦日營',
-        time: '2021.10.30',
-        city: '台中'
-    },
-    {
-        id: id++,
-        title: '愛在家夫婦日營',
-        time: '2021.10.30',
-        city: '台中'
-    },
-    {
-        id: id++,
-        title: '愛在家夫婦日營',
-        time: '2021.10.30',
-        city: '台中'
-    },
-    {
-        id: id++,
-        title: '愛在家夫婦日營',
-        time: '2021.10.30',
-        city: '台中'
-    },
-    {
-        id: id++,
-        title: '愛在家夫婦日營',
-        time: '2021.10.30',
-        city: '台中'
-    }
-])
-</script>

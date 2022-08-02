@@ -1,5 +1,4 @@
 import { apiHelper } from '../utili/helper';
-const getToken = () => localStorage.getItem('token');
 
 export default {
     logIn({ account, password }) {

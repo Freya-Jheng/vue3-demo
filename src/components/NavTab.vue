@@ -2,14 +2,38 @@
     <div class="navTab">
         <ul class="navTab__items">
             <li
-            v-for="item in navTabs"
+            v-for="item in navTabs.value"
             :key="item.id" 
             class="navTab__items__item">
-                {{item.title}}
+                {{item.tag}}
             </li>
         </ul>
     </div>
 </template>
+
+<script setup>
+import { reactive } from 'vue';
+import frontCampAPI from '../front-page-apis/camp';
+
+const navTabs = reactive([]);
+
+// functions
+async function getAllTags() {
+    try {
+        const response = await frontCampAPI.getAllTags();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+        
+        navTabs.value = response.data;
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+getAllTags();
+</script>
 
 <style scoped lang="scss">
 .navTab {
@@ -42,22 +66,3 @@
     }
 }
 </style>
-
-<script setup>
-import { reactive } from 'vue';
-let id = 0
-const navTabs = reactive([
-    {
-        id: id++,
-        title: '所有消息'
-    },
-    {
-        id: id++,
-        title: '盟約夫婦日常'
-    },
-    {
-        id: id++,
-        title: '愛在家夫婦日常'
-    }
-])
-</script>
