@@ -39,7 +39,7 @@ async function addCamp() {
         const response = await campAPI.addNewCamp({
             title: newCamp.title,
             campTagId: newCamp.campTagId,
-            date: newCamp.date.replace(re, '/'),
+            date: newCamp.date,
             content: newCamp.content,
         });
 

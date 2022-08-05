@@ -31,7 +31,7 @@
                         <td>{{ list.title }}</td>
                         <td>
                             <div class="cover-image-dispay">
-                                <img :src="`data:application/image;base64,${src}`" alt="" />
+                                <!-- <img :src="`data:application/image;base64,${src}`" alt="" /> -->
                                 <img :src="src" alt="">
                             </div>
                         </td>
@@ -157,6 +157,7 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { reactive, ref } from 'vue';
@@ -176,7 +177,7 @@ const newArticle = reactive({
 const file = ref('');
 const fileCover = ref('');
 const widthModal = ref('');
-let src = '';
+let src = ref('');
 
 // functions
 function modalResize() {
@@ -221,18 +222,35 @@ async function getArticles() {
         if (response.status !== 200) {
             throw new Error(response.status);
         };
+        const token = localStorage.getItem('token');
 
         lists.value = { ...response.data };
+        let link = lists.value[0].file
+
+        axios({
+            method: 'GET',
+            url: link,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(function (response) {
+            src.value = response;
+        })
+        .catch(function (error) {
+            console.log('錯誤', error);
+        });
+
     } catch (err) {
         console.log(err)
     }
 };
 async function getImage(id) {
     try {
-        const response = await articlesAPI.getArticlesImage({id});
+        const response = await articlesAPI.getArticlesImage({ id });
         console.log(response);
         src = response.data;
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 };

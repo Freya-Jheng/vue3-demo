@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="courses__content">
-            <Searchbar v-model="searchKeywords" />
+            <Searchbar v-model="searchKeyword" :searchFunction="searchCourses" />
             <div class="courses__content__cards">
                 <div v-for="video in courses.value" :key="video.id" class="courses__content__cards__card">
                     <div class="courses__content__cards__card__top">
@@ -18,7 +18,8 @@
                     </div>
                     <div class="courses__content__cards__card__bottom">
                         <h5 class="courses__content__cards__card__bottom__title">{{ video.name }}
-                            <span style="margin-left: 5px;">{{video.date}}</span></h5>
+                            <span style="margin-left: 5px;">{{ video.date }}</span>
+                        </h5>
                     </div>
                 </div>
             </div>
@@ -137,6 +138,7 @@
                             background-color: rgba(187, 187, 187, 0.9);
                             mix-blend-mode: normal;
                         }
+
                         :nth-child(2) {
                             opacity: 1;
                         }
@@ -228,24 +230,38 @@ import frontCoureseAPI from '../front-page-apis/courses';
 let id = 0;
 const courses = reactive([]);
 const copyCourse = reactive([]);
-const searchKeywords = ref('');
+const searchKeyword = ref('');
 
 // functions
-function searchCourse() {
-    
-}
+function searchCourses() {
+    const newC = [];
+
+    if (!searchKeyword.value.trim()) {
+        courses.value = copyCourse.value;
+        searchKeyword.value = '';
+        return alert('請輸入課程名稱！');
+    };
+
+    courses.value = copyCourse.value;
+    courses.value.forEach((list) => {
+        if (list.name === searchKeyword.value) {
+            newC.push(list)
+        }
+    });
+    courses.value = newC
+};
 async function getAllFrontCourses() {
     try {
         const response = await frontCoureseAPI.getAllCourses();
 
-        if(response.status !== 200) {
+        if (response.status !== 200) {
             throw new Error(response.status);
         };
 
         courses.value = response.data;
         copyCourse.value = response.data;
 
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 };

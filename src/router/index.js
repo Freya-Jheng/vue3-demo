@@ -28,7 +28,19 @@ const router = createRouter({
         {
           path: 'story',
           name: 'story',
-          component: () => import('../views/Story.vue')
+          component: () => import('../views/Story.vue'),
+          children: [
+            {
+              path: '',
+              name: 'all-stories',
+              component: () => import('../views/AllStories.vue')
+            },
+            {
+              path: 'individual/:id',
+              name: 'individual-story',
+              component: () => import('../views/IndividualStory.vue')
+            }
+          ]
         },
         {
           path: 'servant',
@@ -90,7 +102,7 @@ const router = createRouter({
         {
           path: 'courses',
           name: 'courses',
-          component: () => import('../views/Courses.vue')
+          component: () => import('../views/Courses.vue'),
         }
       ]
     },

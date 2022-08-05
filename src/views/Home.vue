@@ -45,7 +45,8 @@
       <Carousel class="landing__stories__content" :itemsToShow="1.3" :autoplay="3000" :wrap-around="true">
         <Slide v-for="story in GsFamily.frontArticles" :key="story.id" class="landing__stories__content__card">
           <div class="landing__stories__content__card__left">
-            <img :src="`data:application/image;base64,${story.image}`" alt="">
+            <!-- <img :src="`data:application/image;base64,${story.image}`" alt=""> -->
+            <img src="../assets/default-image.png" alt="">
           </div>
           <div class="landing__stories__content__card__right">
             <h6 class="landing__stories__content__card__right__title">
@@ -108,10 +109,11 @@ import { useGsFamily } from '../stores/gsfamily';
 const GsFamily = useGsFamily();
 GsFamily.getAllFrontArticles();
 GsFamily.getAllFrontCamps();
+GsFamily.getAllFrontVideos();
 
-let id = 0
-let it = 0
-let ip = 0
+let id = 0;
+let it = 0;
+let ip = 0;
 const news = reactive([
   {
     id: id++,
@@ -195,10 +197,12 @@ const breakpoints = {
 .landing {
   width: 100%;
   overflow-y: scroll;
+
   &::-webkit-scrollbar {
     display: none;
     // all: unser;
   }
+
   // command styles for title start
   .title {
     position: relative;
@@ -258,6 +262,7 @@ const breakpoints = {
 
     }
   }
+
   // command styles for title end
 
   &__header {
@@ -532,6 +537,7 @@ const breakpoints = {
         &__left {
           width: 70%;
           height: 100%;
+
           img {
             width: 100%;
             height: 99%;
@@ -701,6 +707,7 @@ const breakpoints = {
 
   }
 }
+
 section {
   margin-top: 5vh;
 }
@@ -710,9 +717,11 @@ section {
 .carousel {
   width: 100%;
 }
+
 .carousel__viewport {
   overflow: hidden;
 }
+
 .carousel__prev,
 .carousel__next {
   width: 20px;
@@ -722,12 +731,15 @@ section {
   border-radius: 0;
   cursor: pointer;
 }
+
 .carousel__prev {
   margin-left: 3%;
 }
+
 .carousel__next {
   margin-right: 3%;
 }
+
 @media screen and (min-width: 768px) {
 
   .carousel__prev,

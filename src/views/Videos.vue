@@ -7,9 +7,9 @@
             </div>
         </div>
         <div class="videos__content">
-            <Searchbar />
+            <Searchbar v-model="searchKeyword" :searchFunction="searchCourses" />
             <div class="videos__content__cards">
-                <div v-for="video in GsFamily.frontVideos" :key="video.id" class="videos__content__cards__card">
+                <div v-for="video in videos.value " :key="video.id" class="videos__content__cards__card">
                     <div class="videos__content__cards__card__top">
                         <div class="videos__content__cards__card__top__cover"></div>
                         <img src="../assets/videos-icon.png" alt="" class="videos__content__cards__card__top__icon">
@@ -29,30 +29,51 @@
 <script setup>
 import Searchbar from '../components/Searchbar.vue';
 import Pagination from '../components/Pagination.vue';
-import { reactive } from 'vue';
-import { useGsFamily } from '../stores/gsfamily';
-const GsFamily = useGsFamily();
-GsFamily.getAllFrontVideos();
+import { reactive, ref } from 'vue';
+import frontVideosAPI from '../front-page-apis/videos';
 
-let id = 0;
-const videos = reactive([
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-    {
-        id: id++,
-        title: '好僕人宣傳影片',
-    },
-])
+const videos = reactive([]);
+const copyVideos = reactive([]);
+const searchKeyword = ref('');
+
+
+// functions
+function searchCourses() {
+    const newC = [];
+
+    if (!searchKeyword.value.trim()) {
+        videos.value = copyVideos.value;
+        searchKeyword.value = '';
+        alert('請輸入影片名稱！');
+        return;
+    };
+
+    videos.value = copyVideos.value;
+    videos.value.forEach((video) => {
+        if (video.name === searchKeyword.value) {
+            newC.push(video);
+        };
+    });
+    videos.value = newC;
+};
+
+async function getAllFrontVideos() {
+    try {
+        const response = await frontVideosAPI.getAllVideos();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        videos.value = response.data;
+        copyVideos.value = response.data;
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+getAllFrontVideos();
 </script>
 
 <style lang="scss" scoped>

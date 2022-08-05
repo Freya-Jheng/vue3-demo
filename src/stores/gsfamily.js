@@ -77,7 +77,6 @@ export const useGsFamily = defineStore('GsFamily', {
         if (response.status !== 200) {
           throw new Error(response.status);
         };
-        console.log(response)
         this.frontArticles = response.data;
         this.getImage(response.data[0].id)
       } catch (err) {

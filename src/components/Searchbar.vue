@@ -1,11 +1,39 @@
 <template>
     <div class="contain">
         <div class="searchbar">
-            <input placeholder="Search..." type="text" class="searchbar__input">
-            <img src="../assets/searchbar-icon.png" alt="" class="searchbar__icon">
+            <input :value="modelValue" placeholder="Search..." type="text" class="searchbar__input"
+                @input="updateValue($event.target.value)">
+            <button @click="searchFunction" type="button">
+                <img src="../assets/searchbar-icon.png" alt="" class="searchbar__icon" />
+            </button>
         </div>
     </div>
 </template>
+
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+    modelValue: {
+        type: String,
+        required: true
+    },
+    searchFunction: {
+        type: Function,
+    }
+})
+const emit = defineEmits(['update:modelValue'])
+const value = computed({
+    get: () => {
+        return modelValue.value
+    }
+})
+const updateValue = (value) => {
+    emit('update:modelValue', value);
+}
+
+</script>
+
 
 <style scoped lang="scss">
 .contain {
@@ -13,6 +41,7 @@
     display: flex;
     justify-content: flex-end;
 }
+
 .searchbar {
     width: 40vw;
     max-width: 356px;
@@ -32,7 +61,9 @@
     }
 
     &__input {
-        &:focus, &:hover {
+
+        &:focus,
+        &:hover {
             all: unset;
         }
     }

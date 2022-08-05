@@ -4,7 +4,10 @@ export default {
     getAllArticles() {
         return apiHelper.get('/front/article');
     },
-    getArticleImage({id}) {
-        return apiHelper.get(`/front/article/browse/${id}`);
+    getArticle({ id }) {
+        return apiHelper.get(`/front/article/${ id }`);
+    },
+    getArticleImage({ id }) {
+        return apiHelper.get(`/front/article/browse/${ id }`);
     },
 }
