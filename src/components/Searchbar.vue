@@ -1,11 +1,34 @@
 <template>
     <div class="contain">
         <div class="searchbar">
-            <input placeholder="Search..." type="text" class="searchbar__input">
+            <input :value="modelValue" placeholder="Search..." type="text" class="searchbar__input" @input="updateValue">
             <img src="../assets/searchbar-icon.png" alt="" class="searchbar__icon">
         </div>
     </div>
 </template>
+<script setup>
+import { defineProps, defineEmits, computed } from 'vue'
+
+const props = defineProps({
+    modelValue: {
+        type: String,
+        required: true
+    }
+})
+const emit = defineEmits(['update:modelValue'])
+
+const value = computed({
+    get: () => {
+        return modelValue.value
+    }
+})
+
+
+const updateValue = (event) => {
+    emit('update:modelValue', event.target.value);
+}
+
+</script>
 
 <style scoped lang="scss">
 .contain {
