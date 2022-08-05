@@ -1,10 +1,10 @@
 <template>
     <div class="navTab">
         <ul class="navTab__items">
-            <li
-            v-for="item in navTabs.value"
-            :key="item.id" 
-            class="navTab__items__item">
+            <li class="navTab__items__item">
+                所有營會
+            </li>
+            <li v-for="item in navTabs.value" :key="item.id" class="navTab__items__item">
                 {{item.tag}}
             </li>
         </ul>

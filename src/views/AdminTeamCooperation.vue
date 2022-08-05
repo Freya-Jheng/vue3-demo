@@ -2,13 +2,17 @@
     <div class="cooperate-team">
         <div class="cooperate-team__selects">
             <select name="" id="" class=" cooperate-team__selects__camp-category">
-                <option value="愛在家夫婦日營">選擇營會類別</option>
-                <option value="婚姻">婚姻</option>
+                <option value="">選擇營會類別</option>
+                <option v-for="tag in GsFamily.campTags" :key="tag.id" :value="tag.id">{{ tag.tag }}</option>
             </select>
             <select name="" id="" class=" cooperate-team__selects__date-category">
-                <option value="愛在家夫婦日營">選擇營會日期</option>
-                <option value="婚姻">婚姻</option>
+                <option value="">選擇營會日期</option>
+                <option v-for="date in dates.value" :key="date.id" :value="date">{{ date }}</option>
             </select>
+            <button type="button" class="cooperate-team__selects__button">
+                <img src="../assets/search-icon-white.png" alt="search" class="cooperate-team__selects__button__icon">
+                <span class="cooperate-team__selects__button__text">搜尋</span>
+            </button>
         </div>
         <div class="cooperate-team__display">
             <table class="cooperate-team__display__table table-hover">
@@ -22,13 +26,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="list in lists " :key="list.id">
-                        <td>{{ list.time }}</td>
-                        <td>{{ list.place }}</td>
-                        <td>{{ list.address }}</td>
-                        <td>{{ list.address }}</td>
+                    <tr v-for="list in lists.value " :key="list.id">
+                        <td>{{ list.date }}</td>
+                        <td>{{ list.teamName }}</td>
+                        <td>{{ list.name }}</td>
                         <td>{{ list.phone }}</td>
-                        <td><button type="button" class="delete"></button></td>
+                        <td>{{ list.email }}</td>
+                        <td><button @click.prevent.stop="deleteTeams(list.id)" type="button" class="delete"></button></td>
                     </tr>
                 </tbody>
             </table>
@@ -39,37 +43,56 @@
 <script setup>
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import cooperateAPI from '../apis/cooperate.js';
+import { useGsFamily } from '../stores/gsfamily.js';
 
 const router = useRouter();
-const lists = reactive([
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    },
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    },
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    }
-])
+const lists = reactive([]);
+const GsFamily = useGsFamily();
+const dates = reactive([]);
+GsFamily.getTags();
+
+// functions
+async function getTeams() {
+    try {
+        const response = await cooperateAPI.getAllTeam();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        lists.value = response.data;
+
+        lists.value.forEach((list) => {
+            dates.push(list.date);
+        });
+
+        dates.value = dates.filter((element, index, arr) => {
+            return arr.indexOf(element) === index;
+        });
+
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function deleteTeams(id) {
+    try {
+        const response = await cooperateAPI.deleteTeam({id});
+
+        if(response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('刪除成功！');
+        };
+
+        getTeams();
+
+    } catch(err) {
+        console.log(err);
+    };
+};
+
+getTeams();
 </script>
 
 
@@ -87,7 +110,28 @@ const lists = reactive([
         width: 90%;
         display: flex;
         flex-direction: row;
+        gap: 10px;
         justify-content: space-between;
+    }
+
+    button {
+        width: 237px;
+        height: 51px;
+        background: var(--button-bg-color);
+        border-radius: 5px;
+        color: var(--sub-font-color);
+        font-size: 14px;
+        letter-spacing: 0.06em;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+
+        &__icon {
+            width: 16px;
+            height: 18px;
+        }
     }
 
     &__display {

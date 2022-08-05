@@ -7,5 +7,34 @@ export default {
     // tags
     getAllTags() {
         return frontAPIHelper.get('/front/camp/tag');
-    }
+    },
+    // applys
+    applyIndividualCamp({ personalName, phone, email, campId }) {
+        return frontAPIHelper.post('/front/application/personal',{
+            personalName,
+            phone,
+            email,
+            campId
+        });
+    },
+    applyGroupCamp({ teamName, name, phone, email, campId }) {
+        return frontAPIHelper.post('/front/application/team', {
+            teamName,
+            name,
+            phone,
+            email,
+            campId
+        });
+    },
+    applyChurchCamp({ churchName, numbers, name, phone, email, campId, address }) {
+        return frontAPIHelper.post('/front/application/team', {
+            churchName,
+            numbers,
+            name,
+            phone,
+            email,
+            campId,
+            address
+        });
+    },
 }

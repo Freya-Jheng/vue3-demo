@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent.stop="addCamp()" class="admin-home__content__news__announce">
         <select v-model="newCamp.campTagId" name="" id="" class="admin-home__content__news__announce__category">
-            <option value="">選擇消息分類</option>
+            <option value="">選擇營會分類</option>
             <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{tag.tag}}</option>
         </select>
         <div class="admin-home__content__news__announce__date">
@@ -10,7 +10,7 @@
         <input type="text" v-model="newCamp.title" class="admin-home__content__news__announce__title" placeholder="標題">
         <quill-editor v-model:content="newCamp.content" content-type="text" placeholder="請輸入內容..." theme="snow" toolbar="essential"
             style="height: 463px;" class="quill" />
-        <button type="submit">發布消息</button>
+        <button type="submit">發布營會</button>
     </form>
 </template>
 

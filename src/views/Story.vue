@@ -8,16 +8,18 @@
         </div>
         <NavTab />
         <div class="stories__content">
-            <div v-for="story in stories" :key="story.id" class="stories__content__card">
+            <div v-for="story in GsFamily.frontArticles" :key="story.id" class="stories__content__card">
                 <div class="stories__content__card__left">
-                    <!-- <img src="../assets/story-image.png" alt="image" class="stories__content__card__left__image"> -->
+                    <img :src="`data:application/image;base64,${story.image}`" alt="image"
+                        class="stories__content__card__left__image">
+                    
                 </div>
                 <div class="stories__content__card__right">
                     <h6 class="stories__content__card__right__title">
                         {{ story.title }}
                     </h6>
                     <span class="stories__content__card__right__description">
-                        {{ story.description }}
+                        {{ story.content }}
                     </span>
                     <a href="" class="stories__content__card__right__button">
                         <span class="">READ MORE</span>
@@ -28,6 +30,28 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import NavTab from '../components/NavTab.vue';
+import { useGsFamily } from '../stores/gsfamily';
+import frontArticleAPI from '../front-page-apis/article';
+
+const GsFamily = useGsFamily();
+GsFamily.getAllFrontArticles();
+
+// functions
+async function getImage(id) {
+    try {
+        const response = await frontArticleAPI.getArticleImage({id});
+        
+        console.log(response);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+
+</script>
 
 <style lang="scss" scoped>
 .stories {
@@ -130,9 +154,11 @@
 
             &__left {
                 width: 49%;
-                background-image: url('../assets/story-image.png');
-                background-size: 100% 100%;
-                background-repeat: no-repeat;
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }
             }
 
             &__right {
@@ -213,50 +239,3 @@
     }
 }
 </style>
-
-
-<script setup>
-import NavTab from '../components/NavTab.vue';
-import { reactive } from 'vue'
-
-let id = 0
-const stories = reactive([
-    {
-        id: id++,
-        // 直接寫成數字就可以了
-        title: '拾回的眼光',
-        image: '../assets/story-image.png',
-        description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-    },
-    {
-        id: id++,
-        title: '拾回的眼光',
-        image: '',
-        description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-    },
-    {
-        id: id++,
-        title: '拾回的眼光',
-        image: '',
-        description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-    },
-    {
-        id: id++,
-        title: '拾回的眼光',
-        image: '',
-        description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-    },
-    {
-        id: id++,
-        title: '拾回的眼光',
-        image: '',
-        description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-    },
-    {
-        id: id++,
-        title: '拾回的眼光',
-        image: '',
-        description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-    },
-])
-</script>

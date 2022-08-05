@@ -9,7 +9,7 @@
             <table class="admin-home__news-tags__display__table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">營隊名稱</th>
+                        <th scope="col">類別名稱</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                 <div class="modal-body">
                     <form @submit.prevent.stop="editIndividual()" class=" news-tag-modal__edit-account">
                         <div class="news-tag-modal__edit-account__account input">
-                            <span>營隊類別</span>
+                            <span>類別名稱</span>
                             <input v-model="individualTag.tag" type="text">
                         </div>
                         <div class="news-tag-modal__edit-account__wrapper">
@@ -128,9 +128,9 @@ async function addIndividual() {
         const response = await campAPI.addTag({
             tag: newTag.value
         });
-        if (response.status !== 201) {
+        if (response.status !== 200) {
             throw new Error(response.status);
-        } else if (response.status === 201) {
+        } else if (response.status === 200) {
             alert('新增成功');
         }
         GsFamily.getTags();
@@ -175,7 +175,6 @@ async function editIndividual() {
         console.log(err);
     }
 }
-
 </script>
 
 <style lang="scss" scoped>

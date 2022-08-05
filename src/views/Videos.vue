@@ -9,13 +9,13 @@
         <div class="videos__content">
             <Searchbar />
             <div class="videos__content__cards">
-                <div v-for="video in videos" :key="video.id" class="videos__content__cards__card">
+                <div v-for="video in GsFamily.frontVideos" :key="video.id" class="videos__content__cards__card">
                     <div class="videos__content__cards__card__top">
                         <div class="videos__content__cards__card__top__cover"></div>
                         <img src="../assets/videos-icon.png" alt="" class="videos__content__cards__card__top__icon">
                     </div>
                     <div class="videos__content__cards__card__bottom">
-                        <h5 class="videos__content__cards__card__bottom__title">{{ video.title }}</h5>
+                        <h5 class="videos__content__cards__card__bottom__title">{{ video.name }}</h5>
                         <a href="main.js" download="main.js"
                             class="videos__content__cards__card__bottom__download">下載</a>
                     </div>

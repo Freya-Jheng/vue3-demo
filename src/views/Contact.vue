@@ -8,11 +8,11 @@
             <form class="contact__content__form">
                 <div class="contact__content__form__item">
                     <span class="contact__content__form__item__title">姓名</span>
-                    <input type="text" class="contact__content__form__item__input">
+                    <input v-model="newContact.name" type="text" class="contact__content__form__item__input">
                 </div>
                 <div class="contact__content__form__item">
                     <span class="contact__content__form__item__title">電話</span>
-                    <input type="text" class="contact__content__form__item__input">
+                    <input v-model="newContact.phone" type="text" class="contact__content__form__item__input">
                 </div>
                 <div class="contact__content__form__item">
                     <span class="contact__content__form__item__title">地址</span>
@@ -20,17 +20,17 @@
                 </div>
                 <div class="contact__content__form__item">
                     <span class="contact__content__form__item__title">內容</span>
-                    <textarea name="" id="" cols="30" rows="10"
+                    <textarea v-model="newContact.content" name="" id="" cols="30" rows="10"
                         class="contact__content__form__item__textarea"></textarea>
                 </div>
                 <div class="contact__content__form__item file">
                     <span class="contact__content__form__item__title">上傳附件</span>
-                    <input type="file" name="" id="file" style="display:none;"
-                        class="contact__content__form__item__input">
+                    <input @change="handleFileSubmit($event)" type="file" name="" id="file"
+                        class="contact__content__form__item__input" style="display: none;">
                     <label class="contact__content__form__item__label" for="file">
                         選擇檔案
                     </label>
-                    <span class="contact__content__form__item__placeholder">尚未選取檔案</span>
+                    <span class="contact__content__form__item__placeholder">{{ fileName }}</span>
                 </div>
                 <button type="submit" class="contact__content__form__submit">
                     提交表單
@@ -51,6 +51,49 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import frontContactAPI from '../front-page-apis/contact';
+import { ref, reactive } from 'vue';
+
+const newContact = reactive({
+    id: '',
+    name: '',
+    phone: '',
+    date: '',
+    content: '',
+})
+const fileName = ref('尚未選取檔案');
+const formData = reactive([]);
+
+// function
+function handleFileSubmit($event) {
+    const file = $event.target.files[0];
+
+    fileName.value = file.name;
+    formData.value = file;
+};
+
+async function postContact() {
+    try {
+
+        const dto = newContact;
+        const response = await frontContactAPI.postContact({
+            dto: dto,
+            file: formData.value,
+        });
+
+        console.log(response, 'front-contact');
+
+        if (response.status !== 200) {
+            throw new Error(response.status)
+        };
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+</script>
 
 <style lang="scss" scoped>
 .contact {
@@ -223,7 +266,7 @@
                 }
 
                 @media (min-width: 1024px) {
-                    gap: 20px;
+                    gap: 35px;
                 }
             }
 

@@ -1,14 +1,21 @@
 <template>
     <div class="cooperate-individual">
         <div class="cooperate-individual__selects">
-            <select name="" id="" class=" cooperate-individual__selects__camp-category">
-                <option value="愛在家夫婦日營">選擇營會類別</option>
-                <option value="婚姻">婚姻</option>
+            <select v-model="searchKeywords.campTagId" name="" id=""
+                class=" cooperate-individual__selects__camp-category">
+                <option value="">選擇營會類別</option>
+                <option v-for="tag in GsFamily.campTags" :key="tag.id" :value="tag.id">{{ tag.tag }}</option>
             </select>
-            <select name="" id="" class=" cooperate-individual__selects__date-category">
-                <option value="愛在家夫婦日營">選擇營會日期</option>
-                <option value="婚姻">婚姻</option>
+            <select v-model="searchKeywords.date" name="" id="" class="cooperate-individual__selects__date-category">
+                <option value="">選擇營會日期</option>
+                <option v-for="list in dates.value " :key="list.id" :value="list">{{ list }}</option>
             </select>
+            <button @click.prevent.stop="searchDataByCampId" type="button"
+                class="cooperate-individual__selects__button">
+                <img src="../assets/search-icon-white.png" alt="search"
+                    class="cooperate-individual__selects__button__icon">
+                <span class="cooperate-individual__selects__button__text">搜尋</span>
+            </button>
         </div>
         <div class="cooperate-individual__display">
             <table class="cooperate-individual__display__table table-hover">
@@ -21,12 +28,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="list in lists " :key="list.id">
-                        <td>{{ list.time }}</td>
-                        <td>{{ list.place }}</td>
-                        <td>{{ list.address }}</td>
+                    <tr v-for="list in lists.value " :key="list.id">
+                        <td>{{ list.date }}</td>
+                        <td>{{ list.campTag.id }}</td>
                         <td>{{ list.phone }}</td>
-                        <td><button type="button" class="delete"></button></td>
+                        <td>{{ list.email }}</td>
+                        <td><button @click.prevent.stop="deleteIndividuals(list.id)" type="button"
+                                class="delete"></button></td>
                     </tr>
                 </tbody>
             </table>
@@ -38,20 +46,86 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import cooperateAPI from '../apis/cooperate';
+import { useGsFamily } from '../stores/gsfamily';
 
+const GsFamily = useGsFamily();
 const router = useRouter();
 const lists = reactive([]);
+const dates = reactive([]);
+const searchKeywords = reactive({
+    campTagId: '',
+    date: '',
+})
+GsFamily.getTags();
+
 
 // functions
-async function getIndividuals () {
+async function getIndividuals() {
     try {
         const response = await cooperateAPI.getAllIndividual();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        lists.value = response.data;
+
+        lists.value.forEach((list) => {
+            dates.push(list.date);
+        });
+
+        dates.value = dates.filter((element, index, arr) => {
+            return arr.indexOf(element) === index;
+        });
+
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function deleteIndividuals(id) {
+    try {
+        const response = await cooperateAPI.deleteIndividual({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('刪除成功！');
+        };
+
+        getIndividuals();
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function searchData() {
+    try {
+        const personDTO = {
+            campTagId: searchKeywords.campTagId,
+            date: searchKeywords.date.replaceAll("/", "-"),
+        }
+
+        const response = await cooperateAPI.getIndividualByTimeCampId({
+            personDTO,
+        })
 
         console.log(response);
     } catch (err) {
         console.log(err);
     }
 };
+async function searchDataByCampId() {
+    try {
+        const response = await cooperateAPI.getIndividualByCampId({
+            campTagId: searchKeywords.campTagId,
+        });
+
+        console.log(response);
+    } catch (err) {
+        console.log(err);
+    };
+}
 
 getIndividuals();
 </script>
@@ -71,7 +145,28 @@ getIndividuals();
         width: 90%;
         display: flex;
         flex-direction: row;
+        gap: 10px;
         justify-content: space-between;
+    }
+
+    button {
+        width: 237px;
+        height: 51px;
+        background: var(--button-bg-color);
+        border-radius: 5px;
+        color: var(--sub-font-color);
+        font-size: 14px;
+        letter-spacing: 0.06em;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+
+        &__icon {
+            width: 16px;
+            height: 18px;
+        }
     }
 
     &__display {

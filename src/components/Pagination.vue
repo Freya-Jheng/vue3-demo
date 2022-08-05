@@ -26,7 +26,7 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    
+
     &__pages {
         display: flex;
         flex-direction: row;
@@ -57,14 +57,14 @@
 import { ref } from 'vue'
 let currentPageNumber = ref(1)
 function updatePage(e) {
-    let target = e.target
+    let target = e.target;
     if (target.classList.contains("previous") && currentPageNumber.value > 1) {
         currentPageNumber.value--
-        console.log(target)
+
     } else if (target.classList.contains('next') && currentPageNumber.value < 2) {
         currentPageNumber.value++
-        console.log(target)
-    }
+
+    };
 }
 
 </script>

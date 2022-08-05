@@ -2,12 +2,12 @@
     <div class="cooperate-church">
         <div class="cooperate-church__selects">
             <select name="" id="" class="cooperate-church__selects__camp-category">
-                <option value="愛在家夫婦日營">選擇營會類別</option>
-                <option value="婚姻">婚姻</option>
+                <option value="">選擇營會類別</option>
+                <option v-for="tag in GsFamily.campTags" :key="tag.id" :value="tag.id">{{ tag.tag }}</option>
             </select>
             <select name="" id="" class=" cooperate-church__selects__date-category">
-                <option value="愛在家夫婦日營">選擇營會日期</option>
-                <option value="婚姻">婚姻</option>
+                <option value="">選擇營會日期</option>
+                <option v-for="date in dates.value" :key="date.id" :value="date">{{ date }}</option>
             </select>
         </div>
         <div class="cooperate-church__display">
@@ -25,16 +25,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="list in lists " :key="list.id">
-                        <td>{{ list.time }}</td>
-                        <td>{{ list.place }}</td>
-                        <td>{{ list.address }}</td>
+                    <tr v-for="list in lists.value " :key="list.id">
+                        <td>{{ list.campTag.id }}</td>
+                        <td>{{ list.numbers }}</td>
+                        <td>{{ list.date }}</td>
+                        <td>{{ list.churchName }}</td>
+                        <td>{{ list.name }}</td>
                         <td>{{ list.phone }}</td>
-                        <td>{{ list.time }}</td>
-                        <td>{{ list.place }}</td>
+                        <td>{{ list.email }}</td>
                         <td>{{ list.address }}</td>
-                        <td>{{ list.phone }}</td>
-                        <td><button type="button" class="delete"></button></td>
+                        <td><button @click.prevent.stop="deleteChurchs(list.id)" type="button" class="delete"></button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -44,38 +45,57 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import cooperateAPI from '../apis/cooperate.js';
+import { useGsFamily } from '../stores/gsfamily.js';
 
-const router = useRouter();
-const lists = reactive([
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    },
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
-    },
-    {
-        id: '1',
-        time: '『2021-05-15',
-        place: '台中慕義堂',
-        address: '台中市北區忠明路499號3樓',
-        phone: '22056797',
-        email: 'tsai661108@gmail.com',
-        contact: '蔡逸文'
+const lists = reactive([]);
+const dates = reactive([]);
+const GsFamily = useGsFamily();
+
+GsFamily.getTags();
+
+// functions
+async function getChurchs() {
+    try {
+        const response = await cooperateAPI.getAllChurch();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        lists.value = response.data;
+
+        lists.value.forEach((list) => {
+            dates.push(list.date);
+        });
+
+        dates.value = dates.filter((element, index, arr) => {
+            return arr.indexOf(element) === index;
+        });
+
+    } catch (err) {
+        console.log(err);
     }
-])
+};
+
+async function deleteChurchs(id) {
+    try {
+        const response = await cooperateAPI.deleteChurch({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('刪除成功！')
+        };
+
+        getChurchs();
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+getChurchs();
 </script>
 
 

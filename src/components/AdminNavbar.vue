@@ -130,7 +130,7 @@ const items = reactive([
     {
         id: '3',
         title: '影片管理',
-        path: '/admin/home/camp'
+        path: '/admin/home/video'
     },
     {
         id: '4',

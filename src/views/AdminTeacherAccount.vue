@@ -151,7 +151,6 @@ async function getTeachers() {
         };
 
         lists.value = { ...response.data };
-        console.log(response.data)
 
     } catch (err) {
         console.log(err)
@@ -228,19 +227,20 @@ async function addIndividual() {
             return alert('密碼與確認密碼不一樣！')
         }
 
-        const {data} = await accountAPI.addIndividualTeacher({
+        const { data } = await accountAPI.addIndividualTeacher({
             account: newAccount.value.account,
-            pwd: newAccount.value.pwd,
+            password: newAccount.value.pwd,
             remark: newAccount.value.remark
         })
 
-        if (data.statusCodeValue !== 200) {
-            throw new Error(data.statusCode)
-        }
+            // if ( data.status !== 200 ) {
+            //     throw new Error(data.statusCode)
+            // }
 
-        if (data.statusCodeValue === 200) {
-            alert('新增成功')
-        }
+            // if ( data.status === 200 ) {
+            //     alert('新增成功')
+            // }
+            console.log(data)
 
         const response1 = await accountAPI.getTeacherAccount();
 

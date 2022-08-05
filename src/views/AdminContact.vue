@@ -12,17 +12,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="list in lists.value " :key="list.id">
+                    <tr v-for="list in lists " :key="list.id">
                         <td>{{ list.date }}</td>
                         <td>{{ list.name }}</td>
                         <td>{{ list.phone }}</td>
                         <td>{{ list.content }}</td>
-                        <td
+                        <!-- <td
                             @click.prevent.stop="base64ToArrayBuffer(list.file), saveByteArray('contactFile', fileBytes.value)">
                             <font-awesome-icon class="download" v-show="list.file.length > 0"
                                 :icon="['fas', 'download']" />
                             <span v-show="list.file.length <= 0" >no file</span>
-                        </td>
+                        </td> -->
                         <td>
                             <button @click.prevent.stop="deleteContacts(list.id)" type="button"></button>
                         </td>
@@ -106,7 +106,7 @@
 import { reactive, ref } from 'vue';
 import contactAPI from '../apis/contact';
 
-const lists = reactive([]);
+const lists = ref([]);
 const fileBytes = ref('');
 
 // funcitons
@@ -135,7 +135,8 @@ async function getContacts() {
         if (response.status !== 200) {
             throw new Error(response.statusText);
         };
-        lists.value = { ...response.data };
+
+        lists.value = response.data;
 
     } catch (err) {
         console.log(err);

@@ -17,22 +17,22 @@
             </div>
             <div class="apply-camp__content__form">
                 <h5 class="apply-camp__content__form__sub-title sub-title">＊請選擇營會類別：</h5>
-                <form class="apply-camp__content__form__content">
+                <form @submit.prevent.stop="applyChurchCamp" class="apply-camp__content__form__content">
                     <div class="apply-camp__content__form__content__categories">
                         <div class="apply-camp__content__form__content__categories__first">
-                            <input type="checkbox" id="first-input"
+                            <input type="radio" value="1" id="first-input" v-model="applyInform.campId"
                                 class="apply-camp__content__form__content__categories__first__input" />
-                            <label class="apply-camp__content__form__content__categories__first__label"
+                            <!-- <label class="apply-camp__content__form__content__categories__first__label"
                                 for="first-input">
-                            </label>
+                            </label> -->
                             <span class="apply-camp__content__form__content__categories__first__text">盟約夫婦日營</span>
                         </div>
                         <div class="apply-camp__content__form__content__categories__second">
-                            <input type="checkbox" id="second-input"
+                            <input type="radio" value="2" id="second-input" v-model="applyInform.campId"
                                 class="apply-camp__content__form__content__categories__second__input" />
-                            <label class="apply-camp__content__form__content__categories__second__label"
+                            <!-- <label class="apply-camp__content__form__content__categories__second__label"
                                 for="second-input">
-                            </label>
+                            </label> -->
                             <span class="apply-camp__content__form__content__categories__second__text">愛在家夫婦日營</span>
                         </div>
                     </div>
@@ -42,50 +42,60 @@
                                 參加營會的日期:
                             </span>
                             <div class="apply-camp__content__form__content__inform__date__outer">
-                                <img src="../assets/date-icon.png" alt="" class="" />
                                 <input class="apply-camp__content__form__content__inform__date__outer__input input"
-                                    type="text" placeholder="" onfocus="(this.type='date')"
-                                    onblur="if(this.value==''){this.type='text'}">
+                                    type="date" placeholder="" onfocus="(this.type='date')">
                             </div>
                         </div>
                         <div class="apply-camp__content__form__content__inform__name wrapper">
                             <span class="apply-camp__content__form__content__inform__name__title title">
                                 教會或機構名稱：*
                             </span>
-                            <input class="apply-camp__content__form__content__inform__name__input input" type="text">
+                            <input v-model="applyInform.churchName"
+                                class="apply-camp__content__form__content__inform__name__input input" type="text">
                         </div>
                         <div class="apply-camp__content__form__content__inform__address wrapper">
                             <span class="apply-camp__content__form__content__inform__address__title title">
                                 地址
                             </span>
-                            <input class="apply-camp__content__form__content__inform__address__input input" type="text">
+                            <input v-model="applyInform.address"
+                                class="apply-camp__content__form__content__inform__address__input input" type="text">
                         </div>
                         <div class="apply-camp__content__form__content__inform__phone wrapper">
                             <span class="apply-camp__content__form__content__inform__phone__title title">
                                 電話
                             </span>
-                            <input class="apply-camp__content__form__content__inform__phone__input input" type="tel">
+                            <input v-model="applyInform.phone"
+                                class="apply-camp__content__form__content__inform__phone__input input" type="tel">
+                        </div>
+                        <div class="apply-camp__content__form__content__inform__numbers wrapper">
+                            <span class="apply-camp__content__form__content__inform__numbers__title title">
+                                參加人數
+                            </span>
+                            <input v-model="applyInform.numbers"
+                                class="apply-camp__content__form__content__inform__numbers__input input" type="text">
                         </div>
                         <div class="apply-camp__content__form__content__inform__email wrapper">
                             <span class="apply-camp__content__form__content__inform__email__title title">
                                 電郵
                             </span>
-                            <input class="apply-camp__content__form__content__inform__email__input input" type="email">
+                            <input v-model="applyInform.email"
+                                class="apply-camp__content__form__content__inform__email__input input" type="email">
                         </div>
                         <div class="apply-camp__content__form__content__inform__contact wrapper">
                             <span class="apply-camp__content__form__content__inform__contact__title title">
                                 聯絡人姓名
                             </span>
-                            <input class="apply-camp__content__form__content__inform__contact__input input" type="text">
+                            <input v-model="applyInform.name"
+                                class="apply-camp__content__form__content__inform__contact__input input" type="text">
                         </div>
                     </div>
-                    <button data-toggle="modal" data-target="#submitModal"
+                    <button data-toggle="modal" data-target="#submitChurchModal"
                         class="apply-camp__content__form__content__submit" type="button">
                         <span>送出</span>
                     </button>
                     <!-- submit modal start -->
-                    <div class="modal fade" id="submitModal" tabindex="-1" aria-labelledby="submitModalLabel"
-                        aria-hidden="true">
+                    <div class="modal fade" id="submitChurchModal" tabindex="-1"
+                        aria-labelledby="submitChurchModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="submit-modal__content modal-body">
@@ -104,6 +114,64 @@
     </div>
 </template>
 <script setup>
+import { reactive } from 'vue';
+import frontCampAPI from '../front-page-apis/camp';
+
+const applyInform = reactive({
+    churchName: '',
+    numbers: '',
+    name: '',
+    phone: '',
+    email: '',
+    campId: -1,
+    address: ''
+});
+
+// function
+async function applyChurchCamp() {
+    if (applyInform.campId === -1) {
+        return alert('請選擇營隊類別！');
+    }
+
+    if (!applyInform.numbers || !applyInform.address || !applyInform.name.trim() || !applyInform.churchName.trim() || !applyInform.email.trim() || !applyInform.phone.trim()) {
+        return alert('請填寫資料！');
+    }
+
+    try {
+        const modal = document.querySelector('#submitChurchModal');
+        const modalBlack = document.querySelector('.modal-backdrop');
+        const response = await frontCampAPI.applyChurchCamp({
+            churchName: applyInform.churchName,
+            numbers: applyInform.numbers,
+            name: applyInform.name,
+            phone: applyInform.phone,
+            email: applyInform.email,
+            campId: applyInform.campId,
+            address: applyInform.address
+        });
+
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('申請成功！')
+        };
+
+        modal.remove();
+        modalBlack.remove();
+
+        applyInform.churchName = '';
+        applyInform.numbers = '';
+        applyInform.name = '';
+        applyInform.phone = '';
+        applyInform.email = '';
+        applyInform.campId = -1;
+        applyInform.address = '';
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -115,6 +183,7 @@
         margin-bottom: 172px;
 
     }
+
     &__banner {
         width: 100%;
         height: 40vmin;
@@ -459,7 +528,7 @@
     }
 
     // submit modal start
-    #submitModal {
+    #submitChurchModal {
 
         .modal-dialog,
         .modal-content {
@@ -487,6 +556,7 @@
         &__text {
             margin-top: 5%;
             font-size: 0.9rem;
+
             @media (min-width: 768px) {
                 font-size: 1.07rem;
             }
@@ -528,11 +598,37 @@
     // submit modal end
 }
 
-input[type="date"] {
-    position: relative;
-}
+input[type='date'] {
+    width: 100%;
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-    display: none;
+    &:focus-visible {
+        &::-webkit-datetime-edit-fields-wrapper {
+            opacity: 1;
+        }
+    }
+
+    &::-webkit-datetime-edit {
+        margin-left: 50px;
+    }
+
+    &::-webkit-datetime-edit-fields-wrapper {
+        opacity: 0;
+
+        &:focus,
+        &:active {
+            opacity: 1;
+        }
+    }
+
+    &::-webkit-calendar-picker-indicator {
+        position: absolute;
+        opacity: 1;
+        display: block;
+        width: 20px;
+        height: 20px;
+        margin-left: 10px;
+        background-image: url('../assets/calender-icon.png');
+        cursor: pointer;
+    }
 }
 </style>

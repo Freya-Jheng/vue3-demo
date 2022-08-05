@@ -3,22 +3,22 @@ import { apiHelper } from "../utili/helper";
 export default {
     // teacher
     getTeacherAccount() {
-        return apiHelper.get('/admin/user/general');
+        return apiHelper.get('/backend/admin/user/general');
     },
     getIndividualTeacher({ id }) {
-        return apiHelper.get(`/admin/user/general/${id}`);
+        return apiHelper.get(`/backend/admin/user/general/${id}`);
     },
-    editIndividualTeacher({ id, account, pwd, remark }) {
-        return apiHelper.put(`/admin/user/general/${id}`, {
+    editIndividualTeacher({ id, account, password, remark }) {
+        return apiHelper.put(`/backend/admin/user/general/${id}`, {
             account,
-            pwd,
+            password,
             remark,
         });
     },
-    addIndividualTeacher({ account, pwd, remark }) {
-        return apiHelper.post('/admin/user/general', {
+    addIndividualTeacher({ account, password, remark }) {
+        return apiHelper.post('/backend/admin/user/general', {
             account,
-            pwd,
+            password,
             remark,
         });
     },

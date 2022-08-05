@@ -18,22 +18,22 @@
             </div>
             <div class="join-camp__content__form">
                 <h5 class="join-camp__content__form__sub-title sub-title">＊請選擇營會類別：</h5>
-                <form class="join-camp__content__form__content">
+                <form @submit.prevent.stop="applyPersonalCamp" class="join-camp__content__form__content">
                     <div class="join-camp__content__form__content__categories">
                         <div class="join-camp__content__form__content__categories__first">
-                            <input type="checkbox" id="first-input"
+                            <input type="radio" value="1" id="first-input" v-model="applyInform.campId"
                                 class="join-camp__content__form__content__categories__first__input" />
-                            <label class="join-camp__content__form__content__categories__first__label"
+                            <!-- <label class="join-camp__content__form__content__categories__first__label"
                                 for="first-input">
-                            </label>
+                            </label> -->
                             <span class="join-camp__content__form__content__categories__first__text">盟約夫婦日營</span>
                         </div>
                         <div class="join-camp__content__form__content__categories__second">
-                            <input type="checkbox" id="second-input"
+                            <input value="2" type="radio" id="second-input" v-model="applyInform.campId"
                                 class="join-camp__content__form__content__categories__second__input" />
-                            <label class="join-camp__content__form__content__categories__second__label"
+                            <!-- <label class="join-camp__content__form__content__categories__second__label"
                                 for="second-input">
-                            </label>
+                            </label> -->
                             <span class="join-camp__content__form__content__categories__second__text">愛在家夫婦日營</span>
                         </div>
                     </div>
@@ -53,19 +53,22 @@
                             <span class="join-camp__content__form__content__inform__name__title title">
                                 姓名
                             </span>
-                            <input class="join-camp__content__form__content__inform__name__input input" type="text">
+                            <input v-model="applyInform.personalName"
+                                class="join-camp__content__form__content__inform__name__input input" type="text">
                         </div>
                         <div class="join-camp__content__form__content__inform__phone wrapper">
                             <span class="join-camp__content__form__content__inform__phone__title title">
                                 電話
                             </span>
-                            <input class="join-camp__content__form__content__inform__phone__input input" type="tel">
+                            <input v-model="applyInform.phone"
+                                class="join-camp__content__form__content__inform__phone__input input" type="tel">
                         </div>
                         <div class="join-camp__content__form__content__inform__email wrapper">
                             <span class="join-camp__content__form__content__inform__email__title title">
                                 電郵
                             </span>
-                            <input class="join-camp__content__form__content__inform__email__input input" type="email">
+                            <input v-model="applyInform.email"
+                                class="join-camp__content__form__content__inform__email__input input" type="email">
                         </div>
                     </div>
                     <button class="join-camp__content__form__content__submit" type="submit">
@@ -77,8 +80,14 @@
     </div>
 </template>
 <script setup>
-import { reactive } from 'vue'
-
+import { reactive } from 'vue';
+import frontCampAPI from '../front-page-apis/camp';
+const applyInform = reactive({
+    personalName: '',
+    phone:  '',
+    email: '',
+    campId: -1,
+})
 let id = 1
 const guides = reactive([
     {
@@ -94,6 +103,38 @@ const guides = reactive([
         content: '因地區不同，費用有些差異，詳請洽協會。'
     },
 ])
+
+// functions 
+async function applyPersonalCamp() {
+    try {
+        if (applyInform.campId === -1) {
+            return alert('請選擇營隊類型！');
+        }
+        if (!applyInform.personalName.trim() || !applyInform.phone.trim() || !applyInform.email.trim()) {
+            return alert('請填寫資料！');
+        }
+        const response = await frontCampAPI.applyIndividualCamp({
+            personalName: applyInform.personalName,
+            phone: applyInform.phone,
+            email: applyInform.email,
+            campId: applyInform.campId,
+        })
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('申請成功！');
+        }
+
+        applyInform.personalName = '',
+        applyInform.phone = '',
+        applyInform.email = '',
+        applyInform.campId = -1
+
+    } catch(err) {
+        console.log(err);
+    };
+};
 </script>
 
 <style lang="scss" scoped>

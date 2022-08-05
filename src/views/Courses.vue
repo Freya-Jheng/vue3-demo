@@ -7,9 +7,9 @@
             </div>
         </div>
         <div class="courses__content">
-            <Searchbar />
+            <Searchbar v-model="searchKeywords" />
             <div class="courses__content__cards">
-                <div v-for="video in courses" :key="video.id" class="courses__content__cards__card">
+                <div v-for="video in courses.value" :key="video.id" class="courses__content__cards__card">
                     <div class="courses__content__cards__card__top">
                         <img src="../assets/courses-cover.png" alt="cover"
                             class="courses__content__cards__card__top__cover">
@@ -17,7 +17,8 @@
                             <span>下載</span></a>
                     </div>
                     <div class="courses__content__cards__card__bottom">
-                        <h5 class="courses__content__cards__card__bottom__title">{{ video.title }}</h5>
+                        <h5 class="courses__content__cards__card__bottom__title">{{ video.name }}
+                            <span style="margin-left: 5px;">{{video.date}}</span></h5>
                     </div>
                 </div>
             </div>
@@ -221,25 +222,32 @@
 <script setup>
 import Searchbar from '../components/Searchbar.vue';
 import Pagination from '../components/Pagination.vue';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+import frontCoureseAPI from '../front-page-apis/courses';
 
 let id = 0;
-const courses = reactive([
-    {
-        id: id++,
-        title: '盟約日營(上午)V2.1 1105',
-    },
-    {
-        id: id++,
-        title: '盟約日營(上午)V2.1 1105',
-    },
-    {
-        id: id++,
-        title: '盟約日營(上午)V2.1 1105',
-    },
-    {
-        id: id++,
-        title: '盟約日營(上午)V2.1 1105',
-    },
-])
-</script><P></P>
+const courses = reactive([]);
+const copyCourse = reactive([]);
+const searchKeywords = ref('');
+
+// functions
+function searchCourse() {
+    
+}
+async function getAllFrontCourses() {
+    try {
+        const response = await frontCoureseAPI.getAllCourses();
+
+        if(response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        courses.value = response.data;
+        copyCourse.value = response.data;
+
+    } catch(err) {
+        console.log(err);
+    }
+};
+getAllFrontCourses();
+</script>

@@ -18,7 +18,7 @@
           <img src="../assets/roses.png" alt="">
         </div>
         <div class="landing__news__content__list">
-          <div v-for="story in news" :key="story.id" class="landing__news__content__list__card">
+          <div v-for="story in GsFamily.frontCamps" :key="story.id" class="landing__news__content__list__card">
             <div class="landing__news__content__list__card__left">
               <span class="landing__news__content__list__card__left__number">
                 <span v-if="story.id < 10">0</span>{{ story.id }}
@@ -29,7 +29,7 @@
                 {{ story.title }}
               </span>
               <span class="landing__news__content__list__card__right__details">{{ story.time }}<span>{{ story.city
-                  }}</span></span>
+              }}</span></span>
             </div>
             <a href="" class="landing__news__content__list__card__button">READ MORE</a>
           </div>
@@ -43,15 +43,16 @@
         <h1 class="landing__stories__title__main main">STORYS</h1>
       </div>
       <Carousel class="landing__stories__content" :itemsToShow="1.3" :autoplay="3000" :wrap-around="true">
-        <Slide v-for="story in stories" :key="story.id" class="landing__stories__content__card">
+        <Slide v-for="story in GsFamily.frontArticles" :key="story.id" class="landing__stories__content__card">
           <div class="landing__stories__content__card__left">
+            <img :src="`data:application/image;base64,${story.image}`" alt="">
           </div>
           <div class="landing__stories__content__card__right">
             <h6 class="landing__stories__content__card__right__title">
               {{ story.title }}
             </h6>
             <span class="landing__stories__content__card__right__description">
-              {{ story.description }}
+              {{ story.content }}
             </span>
             <a href="" class="landing__stories__content__card__right__button">
               <span class="">READ MORE</span>
@@ -95,12 +96,108 @@
   </div>
 </template>
 
+<script setup>
+import { Carousel, Slide, Navigation } from 'vue3-carousel';
+import 'vue3-carousel/dist/carousel.css'
+import Navbar from '@/components/Navbar.vue'
+import Footer from '@/components/Footer.vue'
+import PaginationVue from '@/components/Pagination.vue';
+import { reactive } from 'vue';
+import { useGsFamily } from '../stores/gsfamily';
+
+const GsFamily = useGsFamily();
+GsFamily.getAllFrontArticles();
+GsFamily.getAllFrontCamps();
+
+let id = 0
+let it = 0
+let ip = 0
+const news = reactive([
+  {
+    id: id++,
+    title: '愛在家夫婦日營',
+    time: '2021.10.30',
+    city: '台中'
+  },
+  {
+    id: id++,
+    title: '愛在家夫婦日營',
+    time: '2021.10.30',
+    city: '台中'
+  },
+  {
+    id: id++,
+    title: '愛在家夫婦日營',
+    time: '2021.10.30',
+    city: '台中'
+  },
+])
+const stories = reactive([
+  {
+    id: it++,
+    title: '拾回的眼光',
+    image: '../assets/story-image.png',
+    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
+  },
+])
+const churchs = reactive([
+  {
+    ip: ip++,
+    title: '嘉義靈糧堂',
+  },
+  {
+    ip: ip++,
+    title: '林口靈糧堂'
+  },
+  {
+    ip: ip++,
+    title: '台北真理堂'
+  },
+  {
+    ip: ip++,
+    title: '台中慕義堂'
+  },
+  {
+    ip: ip++,
+    title: '嘉義靈糧堂',
+  },
+  {
+    ip: ip++,
+    title: '林口靈糧堂'
+  },
+  {
+    ip: ip++,
+    title: '台北真理堂'
+  },
+  {
+    ip: ip++,
+    title: '台中慕義堂'
+  },
+])
+const settings = {
+  itemsToShow: 1,
+  snapAlign: 'center',
+};
+const breakpoints = {
+  768: {
+    itemsToShow: 3,
+    snapAlign: "center"
+  },
+  1024: {
+    itemsToShow: 4,
+    snapAlign: "start"
+  }
+}
+</script>
+
+
 <style scoped lang="scss">
 .landing {
   width: 100%;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;
+    // all: unser;
   }
   // command styles for title start
   .title {
@@ -435,10 +532,11 @@
         &__left {
           width: 70%;
           height: 100%;
-          background-image: url('../assets/story-image.png');
-          background-size: cover;
-          background-repeat: no-repeat;
-          background-position: center center;
+          img {
+            width: 100%;
+            height: 99%;
+            object-fit: contain;
+          }
         }
 
         &__right {
@@ -650,124 +748,3 @@ section {
   align-items: center;
 }
 </style>
-
-
-<script setup>
-import { Carousel, Slide, Navigation } from 'vue3-carousel';
-import 'vue3-carousel/dist/carousel.css'
-import Navbar from '@/components/Navbar.vue'
-import Footer from '@/components/Footer.vue'
-import PaginationVue from '@/components/Pagination.vue';
-import { reactive } from 'vue';
-
-
-let id = 0
-let it = 0
-let ip = 0
-const news = reactive([
-  {
-    id: id++,
-    title: '愛在家夫婦日營',
-    time: '2021.10.30',
-    city: '台中'
-  },
-  {
-    id: id++,
-    title: '愛在家夫婦日營',
-    time: '2021.10.30',
-    city: '台中'
-  },
-  {
-    id: id++,
-    title: '愛在家夫婦日營',
-    time: '2021.10.30',
-    city: '台中'
-  },
-])
-const stories = reactive([
-  {
-    id: it++,
-    title: '拾回的眼光',
-    image: '../assets/story-image.png',
-    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-  },
-  {
-    id: it++,
-    title: '拾回的眼光',
-    image: '',
-    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-  },
-  {
-    id: it++,
-    title: '拾回的眼光',
-    image: '',
-    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-  },
-  {
-    id: it++,
-    title: '拾回的眼光',
-    image: '',
-    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-  },
-  {
-    id: it++,
-    title: '拾回的眼光',
-    image: '',
-    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-  },
-  {
-    id: it++,
-    title: '拾回的眼光',
-    image: '',
-    description: '路加福音中曾記載一個失而復得的比喻，一個婦人，丟失了一塊錢，就細細地尋找，找著了，就歡喜快樂。另一個最為人所熟悉的...'
-  },
-])
-const churchs = reactive([
-  {
-    ip: ip++,
-    title: '嘉義靈糧堂',
-  },
-  {
-    ip: ip++,
-    title: '林口靈糧堂'
-  },
-  {
-    ip: ip++,
-    title: '台北真理堂'
-  },
-  {
-    ip: ip++,
-    title: '台中慕義堂'
-  },
-  {
-    ip: ip++,
-    title: '嘉義靈糧堂',
-  },
-  {
-    ip: ip++,
-    title: '林口靈糧堂'
-  },
-  {
-    ip: ip++,
-    title: '台北真理堂'
-  },
-  {
-    ip: ip++,
-    title: '台中慕義堂'
-  },
-])
-const settings =  {
-  itemsToShow: 1,
-  snapAlign: 'center',
-};
-const breakpoints = {
-  768: {
-    itemsToShow: 3,
-    snapAlign: "center"
-  },
-  1024: {
-    itemsToShow: 4,
-    snapAlign: "start"
-  }
-}
-</script>

@@ -17,22 +17,22 @@
             </div>
             <div class="apply-camp__content__form">
                 <h5 class="apply-camp__content__form__sub-title sub-title">＊請選擇營會類別：</h5>
-                <form class="apply-camp__content__form__content">
+                <form @submit.prevent.stop="applyTeamCamp" class="apply-camp__content__form__content">
                     <div class="apply-camp__content__form__content__categories">
                         <div class="apply-camp__content__form__content__categories__first">
-                            <input type="checkbox" id="first-input"
+                            <input type="radio" value="1" id="first-input" v-model="applyInform.campId"
                                 class="apply-camp__content__form__content__categories__first__input" />
-                            <label class="apply-camp__content__form__content__categories__first__label"
+                            <!-- <label class="apply-camp__content__form__content__categories__first__label"
                                 for="first-input">
-                            </label>
+                            </label> -->
                             <span class="apply-camp__content__form__content__categories__first__text">盟約夫婦日營</span>
                         </div>
                         <div class="apply-camp__content__form__content__categories__second">
-                            <input type="checkbox" id="second-input"
+                            <input type="radio" value="2" id="second-input" v-model="applyInform.campId"
                                 class="apply-camp__content__form__content__categories__second__input" />
-                            <label class="apply-camp__content__form__content__categories__second__label"
+                            <!-- <label class="apply-camp__content__form__content__categories__second__label"
                                 for="second-input">
-                            </label>
+                            </label> -->
                             <span class="apply-camp__content__form__content__categories__second__text">愛在家夫婦日營</span>
                         </div>
                     </div>
@@ -52,7 +52,8 @@
                             <span class="apply-camp__content__form__content__inform__name__title title">
                                 團體名稱：*
                             </span>
-                            <input class="apply-camp__content__form__content__inform__name__input input" type="text">
+                            <input v-model="applyInform.teamName"
+                                class="apply-camp__content__form__content__inform__name__input input" type="text">
                         </div>
                         <div class="apply-camp__content__form__content__inform__address wrapper">
                             <span class="apply-camp__content__form__content__inform__address__title title">
@@ -64,19 +65,22 @@
                             <span class="apply-camp__content__form__content__inform__phone__title title">
                                 電話：*
                             </span>
-                            <input class="apply-camp__content__form__content__inform__phone__input input" type="tel">
+                            <input v-model="applyInform.phone"
+                                class="apply-camp__content__form__content__inform__phone__input input" type="tel">
                         </div>
                         <div class="apply-camp__content__form__content__inform__email wrapper">
                             <span class="apply-camp__content__form__content__inform__email__title title">
                                 電郵
                             </span>
-                            <input class="apply-camp__content__form__content__inform__email__input input" type="email">
+                            <input v-model="applyInform.email"
+                                class="apply-camp__content__form__content__inform__email__input input" type="email">
                         </div>
                         <div class="apply-camp__content__form__content__inform__contact wrapper">
                             <span class="apply-camp__content__form__content__inform__contact__title title">
                                 聯絡人姓名：*
                             </span>
-                            <input class="apply-camp__content__form__content__inform__contact__input input" type="text">
+                            <input v-model="applyInform.name"
+                                class="apply-camp__content__form__content__inform__contact__input input" type="text">
                         </div>
                     </div>
                     <button data-toggle="modal" data-target="#submitModal"
@@ -104,6 +108,57 @@
     </div>
 </template>
 <script setup>
+import frontCampAPI from '../front-page-apis/camp';
+import { reactive } from 'vue';
+
+const applyInform = reactive({
+    teamName: '',
+    name: '',
+    phone: '',
+    email: '',
+    campId: -1
+})
+
+// functions
+async function applyTeamCamp() {
+    try {
+        if (applyInform.campId === -1) {
+            return alert('請選擇營隊類別！');
+        }
+
+        if (!applyInform.name.trim() || !applyInform.teamName.trim() || !applyInform.email.trim() || !applyInform.phone.trim()) {
+            return alert('請填寫資料！');
+        }
+
+        const modal = document.querySelector('#submitModal');
+        const modalBlack = document.querySelector('.modal-backdrop');
+        const response = await frontCampAPI.applyGroupCamp({
+            teamName: applyInform.teamName,
+            name: applyInform.name,
+            phone: applyInform.phone,
+            email: applyInform.email,
+            campId: applyInform.campId
+        });
+
+        if (response.status !== 200) {
+            return alert(response.status);
+        } else {
+            alert('申請成功！');
+        };
+        
+        modal.remove();
+        modalBlack.remove();
+
+        applyInform.teamName = '';
+        applyInform.name = '';
+        applyInform.phone = '';
+        applyInform.email = '';
+        applyInform.campId = -1;
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -155,24 +155,24 @@ const router = createRouter({
           ]
         },
         {
-          path: 'camp',
+          path: 'video',
           name: 'admin-camp',
-          component: () => import('../views/AdminCamp.vue'),
+          component: () => import('../views/AdminVideo.vue'),
           children: [
             {
               path: '',
               name: 'camp-menu',
-              component: () => import('../views/AdminCampMenu.vue')
+              component: () => import('../views/AdminVideoMenu.vue')
             },
-            {
-              path: 'management',
-              name: 'camp-management',
-              component: () => import('../views/AdminCampManagement.vue')
-            },
+            // {
+            //   path: 'management',
+            //   name: 'camp-management',
+            //   component: () => import('../views/AdminCampManagement.vue')
+            // },
             {
               path: 'check',
-              name: 'camp-check',
-              component: () => import('../views/AdminCampCheck.vue')
+              name: 'video-check',
+              component: () => import('../views/AdminVideoCheck.vue')
             }
           ]
         },

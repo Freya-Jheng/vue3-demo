@@ -2,7 +2,7 @@ import { apiHelper } from "../utili/helper";
 
 export default {
     getAllCamps() {
-        return apiHelper.get('/admin/camp');
+        return apiHelper.get('/backend/admin/camp');
     },
     addNewCamp({ title, campTagId, date, content }) {
         return apiHelper.post('/backend/admin/camp', {
@@ -18,6 +18,9 @@ export default {
     getIndividualCamp({ campId }) {
         return apiHelper.get(`/backend/admin/camp/${campId}`);
     },
+    getCampsByCampId({ tag }) {
+        return apiHelper.get(`/backend/admin/camp/campTag?tag=${tag}`);
+    },
     // tag
     getAllTags() {
         return apiHelper.get('/backend/admin/camp/tag');
@@ -31,10 +34,10 @@ export default {
         });
     },
     deleteTag({tagId}) {
-        return apiHelper.delete(`/admin/camp/tag/${tagId}`);
+        return apiHelper.delete(`/backend/admin/camp/tag/${tagId}`);
     },
     editTag({tagId, tag}) {
-        return apiHelper.put(`/admin/camp/tag/${tagId}`, {
+        return apiHelper.put(`/backend/admin/camp/tag/${tagId}`, {
             tag,
         });
     }

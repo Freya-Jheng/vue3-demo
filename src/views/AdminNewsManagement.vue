@@ -1,14 +1,16 @@
 <template>
     <div class="admin-home__content__news__management">
         <div class="admin-home__content__news__management__search">
-            <select name="" id="" class="admin-home__content__news__management__search__category">
-                <option value="選擇消息分類">選擇營會類別</option>
-                <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{tag.tag}}</option>
+            <select v-model="searchTag.id" class="admin-home__content__news__management__search__category" name=""
+                id="">
+                <option value="">選擇營會類別</option>
+                <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{ tag.tag }}</option>
             </select>
-            <button type="button" class="admin-home__content__news__management__search__button">
+            <button @click.prevent.stop="getArticleByCampId" type="button"
+                class="admin-home__content__news__management__search__button">
                 <img src="../assets/search-icon-white.png" alt="search"
                     class="admin-home__content__news__management__search__button__icon">
-                <span class="admin-home__content__news__management__search__button__text">搜尋</span>
+                <span type="button" class="admin-home__content__news__management__search__button__text">搜尋</span>
             </button>
         </div>
         <div class="admin-home__content__news__management__display">
@@ -81,11 +83,15 @@ GsFamily.getTags();
 
 const lists = reactive([]);
 const widthModal = ref('');
+const searchTag = reactive({
+    id: '',
+});
+
 const editCamp = ref({
-    id:'',
+    id: '',
     title: '',
-    campId:'',
-    campTagId:'',
+    campId: '',
+    campTagId: '',
     date: '',
     content: '',
 });
@@ -97,7 +103,6 @@ function modalResize() {
     let width = (windowWidth - 800) / 2 + 'px';
     widthModal.value = width
 };
-
 async function getCamps() {
     try {
         const response = await campAPI.getAllCamps();
@@ -112,7 +117,22 @@ async function getCamps() {
         console.log(err)
     }
 };
+async function getArticleByCampId() {
+    try {
+        const response = await campAPI.getCampsByCampId({
+            tag: searchTag.id,
+        });
 
+        if (response.status !== 200) {
+            console.log(response.status);
+        };
+
+        lists.value = { ...response.data };
+
+    } catch (err) {
+        console.log(err);
+    }
+};
 async function deleteCamp(id) {
     try {
         const response = await campAPI.deleteCamp({ id });
@@ -134,17 +154,16 @@ async function deleteCamp(id) {
         console.log(err);
     }
 };
-
 async function getCamp(campId) {
     try {
         const response = await campAPI.getIndividualCamp({ campId });
-        
+
         if (response.status !== 200) {
-            throw new Error (response.status);
+            throw new Error(response.status);
         };
         const quill = document.querySelector('.quill');
-        const {id, title, content, campTag, date} = response.data;
-      
+        const { id, title, content, campTag, date } = response.data;
+
         editCamp.value = {
             id,
             title,
@@ -154,7 +173,7 @@ async function getCamp(campId) {
             date: date.replaceAll("/", "-")
         }
 
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }

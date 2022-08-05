@@ -6,6 +6,10 @@ const axiosInstance = axios.create({
     baseURL,
 });
 
+const frontAxiosInstance = axios.create({
+    baseURL,
+})
+
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token')
@@ -20,4 +24,4 @@ axiosInstance.interceptors.request.use(
 )
 
 export const apiHelper = axiosInstance;
-export const frontAPIHelper = axiosInstance;
+export const frontAPIHelper = frontAxiosInstance;

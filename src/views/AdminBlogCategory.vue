@@ -1,196 +1,386 @@
 <template>
-    <div class="admin-individual-blog">
-        <form @submit.prevent.stop="saveChange" v-for="item in individualList" :key="item.id"
-            class="admin-individual-blog__form">
-            <div class="admin-individual-blog__form__title input">
-                <span>標題</span>
-                <input v-model="item.title" type="text" name="" id="">
-            </div>
-            <div class="admin-individual-blog__form__institution input">
-                <span>機構</span>
-                <input v-model="item.place" type="text" name="" id="">
-            </div>
-            <div class="admin-individual-blog__form__category input">
-                <span>分類</span>
-                <input v-model="item.category" type="text" name="" id="">
-            </div>
-            <div class="admin-individual-blog__form__time input">
-                <span>時間</span>
-                <input v-model="item.time" type="date">
-            </div>
-            <div class="admin-individual-blog__form__status input">
-                <span>狀態</span>
-                <select v-model="item.status" class="admin-individual-blog__form__remark__select">
-                    <option value="審核通過">審核通過</option>
-                    <option value="審核未通過">審核未通過</option>
-                </select>
-            </div>
-            <div class="admin-individual-blog__form__content input">
-                <span>文章內容</span>
-                <textarea v-model="item.content" name="" id="" cols="30" rows="10"></textarea>
-            </div>
-            <div class="wrapper">
-                <button @click.prevent.stop="goBack" type="button"
-                    class="admin-individual-blog__form__button back">返回</button>
-                <button type="submit" class="admin-individual-blog__form__button save">儲存修改</button>
-            </div>
-        </form>
+    <div class="admin-home__blogs-tags">
+        <div class="admin-home__blogs-tags__add">
+            <button @click="modalResize()" data-toggle="modal" data-target="#add-tag" type="button"
+                class="admin-home__blogs-tags__add__button">＋</button>
+            <span class="admin-home__blogs-tags__add__text">新增好文類別</span>
+        </div>
+        <div class="admin-home__blogs-tags__display">
+            <table class="admin-home__blogs-tags__display__table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">分類名稱</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for=" tag in tags.value " :key="tag.id">
+                        <td>{{ tag.tag }}</td>
+                        <td>
+                            <button @click="getIndividual(tag.id), modalResize()" type="button" class="submit"
+                                data-toggle="modal" :data-id="tag.id" data-target="#staticBackdrop"></button>
+                            <button @click.prevent.stop="deleteIndividual(tag.id)" type="submit"
+                                class="delete"></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+    <!-- edit modal start -->
+    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog" :style="{ marginLeft: widthModal }">
+            <div class="modal-content teacher-account">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">編輯類別</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent.stop="editIndividual()" class=" blogs-tag-modal__edit-account">
+                        <div class="blogs-tag-modal__edit-account__account input">
+                            <span>好文類別</span>
+                            <input v-model="individualTag.tag" type="text">
+                        </div>
+                        <div class="blogs-tag-modal__edit-account__wrapper">
+                            <button type="submit" class="blogs-tag-modal__edit-account__wrapper__submit">儲存</button>
+                            <button type="button" class="blogs-tag-modal__edit-account__wrapper__cancel"
+                                data-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- edit modal end -->
+
+    <!-- add modal start -->
+    <div class="modal fade" id="add-tag" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog" :style="{ marginLeft: widthModal }">
+            <div class="modal-content teacher-account">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">新增好文類別</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent.stop="addIndividual" class="blogs-tag-modal__edit-account">
+                        <div class="blogs-tag-modal__edit-account__account input">
+                            <span>類別名稱</span>
+                            <input v-model="newTag" type="text">
+                        </div>
+                        <div class="blogs-tag-modal__edit-account__wrapper">
+                            <button type="submit" class="blogs-tag-modal__edit-account__wrapper__submit">新增</button>
+                            <button type="button" class="blogs-tag-modal__edit-account__wrapper__cancel"
+                                data-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- add modal end -->
 </template>
 
+<script setup>
+import { reactive, ref } from 'vue';
+import articlesAPI from '../apis/articles';
+
+
+const tags = reactive([]);
+const individualTag = ref({
+    tag: '',
+    id: '',
+});
+const newTag = ref('');
+const widthModal = ref('');
+
+// functions
+function modalResize() {
+    let windowWidth = $(document.body).width();
+    let width = (windowWidth - 800) / 2 + 'px';
+    widthModal.value = width
+};
+async function getTags() {
+    try {
+        const response = await articlesAPI.getAllArticleTags();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        tags.value = { ...response.data };
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function getIndividual(id) {
+    try {
+        const response = await articlesAPI.getArticleTag({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        individualTag.value = { ...response.data }
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function addIndividual() {
+    try {
+        if (!newTag.value.trim()) {
+            return alert('請輸入好文類別！')
+        }
+        const response = await articlesAPI.addArticleTags({
+            tag: newTag.value
+        });
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else if (response.status === 200) {
+            alert('新增成功');
+        }
+
+        getTags();
+
+        newTag.value = '';
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function deleteIndividual(id) {
+    try {
+        const response = await articlesAPI.deleteArticleTags({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else if (response.status === 200) {
+            alert('確認刪除');
+        }
+
+        getTags();
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function editIndividual() {
+    try {
+        const response = await articlesAPI.editArticleTags({
+            id: individualTag.value.id,
+            tag: individualTag.value.tag
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else if (response.status === 200) {
+            alert('修改成功');
+        }
+
+        getTags();
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+getTags();
+</script>
+
 <style lang="scss" scoped>
-.admin-individual-blog {
-    width: 80%;
-    max-width: 1003px;
-    margin: 50px 0 0 60px;
+.admin-home__blogs-tags {
+    width: 100%;
+    height: 100%;
     font-size: 14px;
     line-height: 19px;
     letter-spacing: 0.06em;
+    padding: 80px 0 0 60px;
     color: var(--select-color);
-    position: relative;
+    cursor: pointer;
 
-    &__form {
+    &__add {
+        width: 100%;
+        margin-bottom: 5%;
 
-        input,
-        textarea,
-        select {
-            max-width: 1003px;
-            height: 52px;
-            border: 0.5px solid var(--input-icon-border);
-            border-radius: 5px;
-            font-size: 14px;
-            line-height: 19px;
-            letter-spacing: 0.06em;
-            color: var(--select-color);
-            padding-left: 15px;
-            background-color: var(--sub-font-color);
-        }
+        &:hover {
+            font-weight: 500;
 
-        textarea {
-            height: auto;
-        }
-
-        .input {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 23px;
-
-            span {
-                margin-left: 15px;
-            }
-        }
-
-        input[type='date'] {
-            width: 100%;
-
-            &:focus-visible {
-                &::-webkit-datetime-edit-fields-wrapper {
-                    opacity: 1;
-                }
-            }
-
-            &::-webkit-datetime-edit {
-                margin-left: 50px;
-            }
-
-            &::-webkit-datetime-edit-fields-wrapper {
-                opacity: 1;
-
-                &:focus,
-                &:active {
-                    opacity: 1;
-                }
-            }
-
-            &::-webkit-calendar-picker-indicator {
-                position: absolute;
-                opacity: 1;
-                display: block;
-                width: 20px;
-                height: 20px;
-                background-image: url('../assets/calender-icon.png');
-                cursor: pointer;
+            :nth-child(1) {
+                color: var(--sub-font-color);
+                background-color: var(--button-bg-color);
             }
         }
 
         button {
-            width: 237px;
-            height: 51px;
-            background: var(--button-bg-color);
-            border-radius: 5px;
-            color: var(--sub-font-color);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             text-align: center;
-            margin-top: 43px;
+            font-size: 16px;
         }
 
-        .save {
+        span {
+            margin-left: 20px;
+        }
+    }
+
+    &__display {
+        width: 90%;
+
+        table {
+            width: 100%;
+        }
+
+        thead {
+            width: 100%;
+            border-bottom: 0.5px solid var(--input-icon-border);
+        }
+
+        th,
+        td {
+            text-align: center;
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 19px;
+            letter-spacing: 0.06em;
+            color: var(--table-font-color);
+            padding-bottom: 16px;
+        }
+
+        td {
+            height: 71px;
+            line-height: 71px;
+            border-bottom: 0.5px solid var(--input-icon-border);
+        }
+
+        button {
+            width: 92px;
+            height: 31px;
+            border-radius: 5px;
+        }
+
+        .submit {
+            position: relative;
+            background: var(--button-bg-color);
+            margin-right: 10px;
+
+            &::after {
+                position: absolute;
+                top: 50%;
+                right: 50%;
+                transform: translate(50%, -50%);
+                content: '編輯';
+                color: var(--sub-font-color);
+            }
+        }
+
+        .delete {
+            position: relative;
             background-color: var(--check-button-bg-color);
-        }
 
-        .wrapper {
-            position: absolute;
-            right: 50%;
-            transform: translateX(50%);
-            display: flex;
-            flex-direction: row;
-            gap: 10%;
+            &::after {
+                position: absolute;
+                top: 50%;
+                right: 50%;
+                transform: translate(50%, -50%);
+                content: '刪除';
+                color: var(--sub-font-color);
+            }
         }
     }
 }
-</style>
 
-<script setup>
-import { useRouter, useRoute } from 'vue-router';
-import { ref, reactive } from 'vue';
-const router = useRouter();
-const route = useRoute();
-const individualList = reactive({});
-const lists = reactive([
-    {
-        id: '1',
-        title: '『節儉』起家',
-        place: 'test',
-        category: '婚姻與跟進訣竅',
-        time: '2021-01-03',
-        status: '審核未通過',
-        content: 'hvqhwlifhglrifglihrglflwa',
-    },
-    {
-        id: '2',
-        title: '『節儉』起家',
-        place: 'test',
-        category: '婚姻與跟進訣竅',
-        time: '2021-01-03',
-        status: '審核通過',
-        content: 'hvqhwlifhglrifglihrglflwa',
-    },
-    {
-        id: '3',
-        title: '『節儉』起家',
-        place: 'test',
-        category: '婚姻與跟進訣竅',
-        time: '2021-01-03',
-        status: '審核通過',
-        content: 'hvqhwlifhglrifglihrglflwa',
-    },
-])
-
-// functions
-function goBack() {
-    router.go(-1);
-};
-
-function renderIndividualList() {
-    const currentId = route.params.id;
-    lists.forEach((item) => {
-        if (item.id === currentId) {
-            individualList.value = { ...item }
-        }
-    });
-};
-function saveChange () {
-    router.go(-1);
+// Modal
+.modal-dialog {
+    display: inline-block;
+    width: auto;
 }
-renderIndividualList()
-</script>
+
+.modal-content {
+    width: 800px;
+    height: 500px;
+}
+
+.modal-header {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--table-font-color);
+    padding-bottom: 50px;
+    position: relative;
+
+    h5 {
+        position: absolute;
+        right: 50%;
+        transform: translateX(50%);
+        border-bottom: 3.5px solid var(--table-font-color);
+    }
+}
+
+.blogs-tag-modal__edit-account {
+    max-width: 1003px;
+    font-size: 14px;
+    line-height: 19px;
+    letter-spacing: 0.06em;
+    color: var(--select-color);
+
+    input {
+        max-width: 1003px;
+        height: 52px;
+        border: 0.5px solid var(--input-icon-border);
+        border-radius: 5px;
+        font-size: 14px;
+        line-height: 19px;
+        letter-spacing: 0.06em;
+        color: var(--select-color);
+        padding-left: 15px;
+    }
+
+    input[type="file"] {
+        padding-top: 13px;
+    }
+
+    .input {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 23px;
+
+        span {
+            margin-left: 15px;
+        }
+    }
+
+
+
+    &__wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+
+        &__submit {
+            background: var(--button-bg-color);
+        }
+
+        &__cancel {
+            background-color: var(--check-button-bg-color);
+        }
+    }
+
+    button {
+        width: 237px;
+        height: 51px;
+        border-radius: 5px;
+        color: var(--sub-font-color);
+        text-align: center;
+        margin-top: 100px;
+    }
+}
+</style>
