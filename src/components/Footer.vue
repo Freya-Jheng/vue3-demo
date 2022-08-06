@@ -12,7 +12,7 @@
                 </router-link>
             </li>
             <li class="footer__categories__item">
-                <router-link to="/home/camp" class="footer__categories__item__link">
+                <router-link to="/home/camp-individual" class="footer__categories__item__link">
                     參與營會
                 </router-link>
             </li>

@@ -1,11 +1,12 @@
 <template>
     <div class="admin-home__content__blog__lists">
         <div class="admin-home__content__blog__lists__search">
-            <select name="" id="" class="admin-home__content__blog__lists__search__article">
-                <option value="選擇文章類別">選擇文章類別</option>
+            <select v-model="seachId" name="" id="" class="admin-home__content__blog__lists__search__article">
+                <option value="">選擇文章類別</option>
                 <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id">{{ item.tag }}</option>
             </select>
-            <button type="button" class="admin-home__content__blog__lists__search__button">
+            <button @click.prevent.stop="searchArticle" type="button"
+                class="admin-home__content__blog__lists__search__button">
                 <img src="../assets/search-icon-white.png" alt="search"
                     class="admin-home__content__blog__lists__search__button__icon">
                 <span class="admin-home__content__blog__lists__search__button__text">搜尋</span>
@@ -32,13 +33,13 @@
                         <td>
                             <div class="cover-image-dispay">
                                 <!-- <img :src="`data:application/image;base64,${src}`" alt="" /> -->
-                                <img :src="src" alt="">
+                                <img src="../assets/default-image.png" alt="">
                             </div>
                         </td>
                         <td>
-                            <button @click="modalResize()" type="button" class="submit" data-toggle="modal"
-                                data-target="#edit-articles"></button>
-                            <button type="submit" class="delete"></button>
+                            <button @click="getArticle(list.id), modalResize()" type="button" class="submit"
+                                data-toggle="modal" data-target="#edit-articles"></button>
+                            <button @click.prevent.stop="deleteArticle(list.id)" type="button" class="delete"></button>
                         </td>
                     </tr>
                 </tbody>
@@ -61,10 +62,10 @@
                     <form class="course-management">
                         <div class="course-management__name input">
                             <span>標題</span>
-                            <input type="text">
+                            <input v-model="editArticle.title" type="text">
                         </div>
-                        <select name="" id="" class="course-management__category select">
-                            <option value="選擇文章類別">選擇文章類別</option>
+                        <select class="course-management__category select">
+                            <option value="">選擇文章類別</option>
                             <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id"> {{ item.tag
                             }}
                             </option>
@@ -79,14 +80,14 @@
                         </div>
                         <div class="course-management__keyword input">
                             <span>關鍵字</span>
-                            <input type="text">
+                            <input v-model="editArticle.keywords" type="text">
                         </div>
                         <div class="course-management__narrative input">
                             <span>敘述 </span>
-                            <input type="text">
+                            <input v-model="editArticle.narrative" type="text">
                         </div>
-                        <quill-editor placeholder="請輸入內容..." theme="snow" toolbar="essential" style="height: 463px;"
-                            class="quill" />
+                        <quill-editor v-model:content="editArticle.content" placeholder="請輸入內容..." theme="snow"
+                            toolbar="essential" style="height: 463px;" class="quill" />
                         <div class="course-management__wrapper">
                             <button type="submit" class="course-management__wrapper__submit">新增</button>
                             <button type="button" class="course-management__wrapper__cancel"
@@ -163,6 +164,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { reactive, ref } from 'vue';
 import articlesAPI from '../apis/articles';
 import { useGsFamily } from '../stores/gsfamily';
+
 const GsFamily = useGsFamily();
 GsFamily.getArticleTags();
 const lists = reactive([]);
@@ -174,9 +176,11 @@ const newArticle = reactive({
     keywords: '',
     narrative: ''
 });
+const editArticle = ref({});
 const file = ref('');
 const fileCover = ref('');
 const widthModal = ref('');
+const seachId = ref('');
 let src = ref('');
 
 // functions
@@ -234,15 +238,58 @@ async function getArticles() {
                 Authorization: `Bearer ${token}`
             }
         })
-        .then(function (response) {
-            src.value = response;
-        })
-        .catch(function (error) {
-            console.log('錯誤', error);
-        });
+            .then(function (response) {
+                src.value = response;
+            })
+            .catch(function (error) {
+                console.log('錯誤', error);
+            });
 
     } catch (err) {
         console.log(err)
+    }
+};
+async function getArticle(id) {
+    try {
+        const response = await articlesAPI.getArticle({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        editArticle.value = response.data;
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function deleteArticle(id) {
+    try {
+        const response = await articlesAPI.deleteArticle({ id });
+
+        if (response.status !== 200) {
+            console.log(response.status);
+        } else {
+            return alert('刪除成功！');
+        };
+
+        getArticles();
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function searchArticle(id) {
+    try {
+        const response = await articlesAPI.searchArticleByTagId({
+            tagId: seachId.value,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        lists.value = response.data;
+    } catch (err) {
+        console.log(err);
     }
 };
 async function getImage(id) {

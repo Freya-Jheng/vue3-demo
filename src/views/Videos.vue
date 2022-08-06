@@ -48,6 +48,10 @@ function searchCourses() {
         return;
     };
 
+    if(!videos.value.includes(searchKeyword.value)) {
+        return alert (`找不到${searchKeyword.value}，請搜尋其他關鍵字！`);
+    };
+
     videos.value = copyVideos.value;
     videos.value.forEach((video) => {
         if (video.name === searchKeyword.value) {
