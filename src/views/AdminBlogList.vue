@@ -32,8 +32,8 @@
                         <td>{{ list.title }}</td>
                         <td>
                             <div class="cover-image-dispay">
-                                <!-- <img :src="`data:application/image;base64,${src}`" alt="" /> -->
-                                <img src="../assets/default-image.png" alt="">
+                                <img src="http://139.162.85.127:8080/backend/admin/article/browse/1" alt="" />
+                                <!-- <img src="../assets/default-image.png" alt=""> -->
                             </div>
                         </td>
                         <td>
@@ -67,7 +67,7 @@
                         <select class="course-management__category select">
                             <option value="">選擇文章類別</option>
                             <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id"> {{ item.tag
-                            }}
+                                }}
                             </option>
                         </select>
                         <div class="course-management__picture input">
@@ -112,7 +112,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="course-management">
+                    <form @submit.prevent.stop="addArticles" class="course-management">
                         <div class="course-management__name input">
                             <span>標題</span>
                             <input v-model="newArticle.title" type="text">
@@ -121,7 +121,7 @@
                             class="course-management__category select">
                             <option value="">選擇文章類別</option>
                             <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id"> {{ item.tag
-                            }}
+                                }}
                             </option>
                         </select>
                         <div class="course-management__picture input">
@@ -178,6 +178,7 @@ const newArticle = reactive({
 });
 const editArticle = ref({});
 const file = ref('');
+const newFiles = reactive([]);
 const fileCover = ref('');
 const widthModal = ref('');
 const seachId = ref('');
@@ -191,7 +192,8 @@ function modalResize() {
 };
 function handleFileChange($event) {
     const { files } = $event.target;
-
+    console.log(files[0]);
+    newFiles.value = files[0];
     if (files.length <= 0) {
         fileCover.value = '';
     } else {
@@ -229,7 +231,9 @@ async function getArticles() {
         const token = localStorage.getItem('token');
 
         lists.value = { ...response.data };
-        let link = lists.value[0].file
+        let link = lists.value[0].file;
+        console.log(lists.value[0].file);
+        src.value = lists.value[0].file;
 
         axios({
             method: 'GET',
@@ -295,7 +299,6 @@ async function searchArticle(id) {
 async function getImage(id) {
     try {
         const response = await articlesAPI.getArticlesImage({ id });
-        console.log(response);
         src = response.data;
     } catch (err) {
         console.log(err);
@@ -303,20 +306,21 @@ async function getImage(id) {
 };
 async function addArticles() {
     try {
+        const file = newFiles.value;
         const dto = {
-            title: '',
-            articleTagId: '',
-            date: '',
-            content: '',
-            keywords: '',
-            narrative: ''
+            title: newArticle.title,
+            articleTagId: newArticle.articleTagId,
+            date: newArticle.date,
+            content: newArticle.content,
+            keywords: newArticle.keywords,
+            narrative: newArticle.narrative
         }
 
         const response = await articlesAPI.addArticles({
             dto,
+            file,
         });
 
-        console.log(response);
     } catch (err) {
         console.log(err);
     }

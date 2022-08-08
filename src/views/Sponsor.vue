@@ -16,22 +16,22 @@
         </div>
         <h5 class="sponsor__title">線上捐款</h5>
         <div class="sponsor__form">
-            <form class="sponsor__form__content">
-                <div class="sponsor__form__content__item">
-                    <span class="sponsor__form__content__item__title">捐款人姓名</span>
-                    <input type="text" class="sponsor__form__content__item__input">
-                </div>
-                <div class="sponsor__form__content__item">
+                <form @submit.prevent.stop="sponsorPost" class="sponsor__form__content">
+                    <div class="sponsor__form__content__item">
+                        <span class="sponsor__form__content__item__title">捐款人姓名</span>
+                        <input v-model="newSponsor.name" type="text" class="sponsor__form__content__item__input">
+                    </div>
+                    <div class="sponsor__form__content__item">
                     <span class="sponsor__form__content__item__title">金額</span>
-                    <input type="number" class="sponsor__form__content__item__input">
+                    <input v-model="newSponsor.price" type="number" class="sponsor__form__content__item__input">
                 </div>
                 <div class="sponsor__form__content__item">
                     <span class="sponsor__form__content__item__title">電話</span>
-                    <input type="text" class="sponsor__form__content__item__input">
+                    <input v-model="newSponsor.phone" type="text" class="sponsor__form__content__item__input">
                 </div>
                 <div class="sponsor__form__content__item">
                     <span class="sponsor__form__content__item__title">地址</span>
-                    <input type="text" class="sponsor__form__content__item__input">
+                    <input v-model="newSponsor.address" type="text" class="sponsor__form__content__item__input">
                 </div>
                 <button type="submit" class="sponsor__form__content__submit">
                     我要捐款
@@ -55,6 +55,46 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { reactive } from 'vue';
+import payMentAPI from '../front-page-apis/payMent';
+
+const newSponsor = reactive({
+    name: '',
+    price: 0,
+    phone: '',
+    address: '',
+});
+
+// functions
+async function sponsorPost() {
+    try {
+        const response = await payMentAPI.postPayment({
+            name: newSponsor.name,
+            price: newSponsor.price,
+            phone: newSponsor.phone,
+            address: newSponsor.address,
+        })
+    } catch (err) {
+        console.log(err);
+    }
+}
+// const api = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
+// const payMent = axios.post('https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5', {
+//     name: newSponsor.name,
+//     price: newSponsor.price,
+//     phone: newSponsor.phone,
+//     address: newSponsor.address,
+// })
+//     .then(function (response) {
+//         console.log(response);
+//     })
+//     .catch(function (err) {
+//         console.log(err);
+//     })
+
+</script>
 
 <style lang="scss" scoped>
 .sponsor {
@@ -207,8 +247,9 @@
 
             @media (min-width: 768px) {
                 margin-bottom: 0px;
-                
+
             }
+
             &__item {
                 display: flex;
                 flex-direction: column;
@@ -319,6 +360,7 @@
 
             &__text {
                 line-height: 20px;
+
                 @media (min-width: 768px) {
                     font-size: 0.75rem;
                     line-height: 24px;

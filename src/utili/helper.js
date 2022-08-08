@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const baseURL = 'http://139.162.85.127:8080';
+const payMentURL = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
 
 const axiosInstance = axios.create({
     baseURL,
@@ -8,6 +9,10 @@ const axiosInstance = axios.create({
 
 const frontAxiosInstance = axios.create({
     baseURL,
+})
+
+const payMentInstance = axios.create({
+    payMentURL,
 })
 
 axiosInstance.interceptors.request.use(
@@ -25,3 +30,4 @@ axiosInstance.interceptors.request.use(
 
 export const apiHelper = axiosInstance;
 export const frontAPIHelper = frontAxiosInstance;
+export const payMentHelper = payMentInstance;
