@@ -3,7 +3,7 @@
         <div class="poster__content__top">
             <h5 class="poster__content__top__title">愛在家</h5>
             <div class="poster__content__top__cards cards">
-                <div @click="moveToEditing" v-for="poster in posters1" :key="poster.id"
+                <div v-for="poster in posters1" @click="moveToEditing(poster.id)" :key="poster.id"
                     class="poster__content__top__cards__card card">
                     <img :src="poster.path" alt="poster" class="poster__content__top__cards__card__image">
                     <span class="poster__content__top__cards__card__title">{{ poster.title }}</span>
@@ -13,7 +13,7 @@
         <div class="poster__content__bottom">
             <h5 class="poster__content__bottom__title">盟約日營</h5>
             <div class="poster__content__bottom__cards cards">
-                <div @click="moveToEditing" v-for="poster in posters2" :key="poster.id"
+                <div v-for="poster in posters2" @click="moveToEditing(poster.id)" :key="poster.id"
                     class="poster__content__bottom__cards__card card">
                     <img :src="poster.path" alt="poster" class="poster__content__bottom__cards__card__image">
                     <span class="poster__content__bottom__cards__card__title">{{ poster.title }}</span>
@@ -25,50 +25,47 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
-
-let id = 0;
-let it = 0;
-const router = useRouter()
+const router = useRouter();
 const posters1 = reactive([
     {
-        id: id++,
+        id: 1,
         title: '愛在家夫婦日營',
         path: '/src/assets/poster1.png',
     },
     {
-        id: id++,
+        id: 2,
         title: '愛在家夫婦日營',
         path: '/src/assets/poster2.png',
     },
     {
-        id: id++,
+        id: 3,
         title: '愛在家夫婦日營',
         path: '/src/assets/poster3.png',
     },
 ])
 const posters2 = reactive([
     {
-        id: it++,
+        id: 4,
         title: '愛在家夫婦日營',
         path: '/src/assets/poster4.png',
     },
     {
-        id: it++,
+        id: 5,
         title: '愛在家夫婦日營',
         path: '/src/assets/poster5.png',
     },
     {
-        id: it++,
+        id: 6,
         title: '愛在家夫婦日營',
         path: '/src/assets/poster6.png',
     }
 ])
 
-function moveToEditing () {
-    router.push('/home/poster/editing')
-}
+function moveToEditing(posterId) {
+    router.push({ path: `editing/${posterId}` });
+};
 </script>
 
 <style lang="scss" scoped>

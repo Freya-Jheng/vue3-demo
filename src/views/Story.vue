@@ -11,22 +11,9 @@
 </template>
 
 <script setup>
-import { useGsFamily } from '../stores/gsfamily';
-import frontArticleAPI from '../front-page-apis/article';
-
-const GsFamily = useGsFamily();
-GsFamily.getAllFrontArticles();
 
 // functions
-async function getImage(id) {
-    try {
-        const response = await frontArticleAPI.getArticleImage({ id });
 
-        console.log(response);
-    } catch (err) {
-        console.log(err);
-    }
-};
 </script>
 
 <style lang="scss" scoped>

@@ -10,7 +10,9 @@ export const useGsFamily = defineStore('GsFamily', {
     campTags: [],
     articaleTags: [],
     frontCamps: [],
+    frontCampsTag: [],
     frontArticles: [],
+    frontArticlesTag: [],
     frontVideos: [],
   }),
   getters: {
@@ -48,7 +50,7 @@ export const useGsFamily = defineStore('GsFamily', {
       try {
         const response = await frontVideosAPI.getAllVideos();
 
-        if(response.status !== 200) {
+        if (response.status !== 200) {
           throw new Error(response.status);
         };
 
@@ -70,6 +72,15 @@ export const useGsFamily = defineStore('GsFamily', {
         console.log(err);
       }
     },
+    async getAllFrontCampTags() {
+      try {
+        const response = await frontCampAPI.getAllTags();
+        this.frontCampsTag = response.data;
+        console.log(response);
+      } catch (err) {
+        console.log(err);
+      }
+    },
     async getAllFrontArticles() {
       try {
         const response = await frontArticleAPI.getAllArticles();
@@ -79,6 +90,21 @@ export const useGsFamily = defineStore('GsFamily', {
         };
         this.frontArticles = response.data;
         this.getImage(response.data[0].id)
+        console.log(response.data, 'article', response)
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async getAllFrontArticleTags() {
+      try {
+        const response = await frontArticleAPI.getArtcleTags();
+
+        if (response.status !== 200) {
+          throw new Error(response.status);
+        };
+
+        this.frontArticlesTag = response.data;
+
       } catch (err) {
         console.log(err);
       }
@@ -87,7 +113,7 @@ export const useGsFamily = defineStore('GsFamily', {
       try {
         const response = await frontArticleAPI.getArticleImage({ id });
 
-        console.log(response);
+        // console.log(response);
       } catch (err) {
         console.log(err);
       }

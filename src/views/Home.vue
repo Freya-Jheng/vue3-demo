@@ -45,8 +45,8 @@
       <Carousel class="landing__stories__content" :itemsToShow="1.3" :autoplay="3000" :wrap-around="true">
         <Slide v-for="story in GsFamily.frontArticles" :key="story.id" class="landing__stories__content__card">
           <div class="landing__stories__content__card__left">
-            <!-- <img :src="`data:application/image;base64,${story.image}`" alt=""> -->
-            <img src="../assets/default-image.png" alt="">
+            <img :src="story.file" alt="">
+            <!-- <img v-if="story.file.length === 0" src="../assets/default-image.png" alt=""> -->
           </div>
           <div class="landing__stories__content__card__right">
             <h6 class="landing__stories__content__card__right__title">

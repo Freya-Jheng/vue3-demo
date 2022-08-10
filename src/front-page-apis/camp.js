@@ -27,7 +27,7 @@ export default {
         });
     },
     applyChurchCamp({ churchName, numbers, name, phone, email, campId, address }) {
-        return frontAPIHelper.post('/front/application/team', {
+        return frontAPIHelper.post('/front/application/church', {
             churchName,
             numbers,
             name,

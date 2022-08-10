@@ -24,7 +24,7 @@
                     </router-link>
                 </li>
                 <li class="app__home__nav__left__items__item">
-                    <router-link to="/home/story" class="item app__home__nav__left__items__item__link">
+                    <router-link to="/home/story/all" class="item app__home__nav__left__items__item__link">
                         好文分享
                     </router-link>
                 </li>

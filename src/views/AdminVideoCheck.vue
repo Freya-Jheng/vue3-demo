@@ -25,7 +25,7 @@
                         <td>{{ list.name }}</td>
                         <td>
                             <div class="cover-image-dispay">
-                                <img src="" alt="">
+                                <img src="../assets/default-image.png" alt="">
                             </div>
                         </td>
                         <td>
@@ -119,7 +119,6 @@
 </template>
 
 <script setup>
-import { list } from 'postcss';
 import { reactive, ref } from 'vue';
 import videoAPI from '../apis/video';
 
@@ -183,6 +182,8 @@ async function getVideos() {
 
         lists.value = response.data;
         copyLists.value = response.data;
+
+        console.log(lists.value);
     } catch (err) {
         console.log(err);
     };

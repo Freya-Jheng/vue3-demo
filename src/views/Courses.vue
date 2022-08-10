@@ -242,10 +242,6 @@ function searchCourses() {
         return alert('請輸入課程名稱！');
     };
 
-    if (!courses.value.includes(searchKeyword.value)) {
-        return alert(`找不到${searchKeyword.value}，請搜尋其他關鍵字！`)
-    }
-
     courses.value = copyCourse.value;
     courses.value.forEach((list) => {
         if (list.name === searchKeyword.value) {

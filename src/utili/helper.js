@@ -9,11 +9,11 @@ const axiosInstance = axios.create({
 
 const frontAxiosInstance = axios.create({
     baseURL,
-})
+});
 
 const payMentInstance = axios.create({
     payMentURL,
-})
+});
 
 axiosInstance.interceptors.request.use(
     (config) => {
@@ -26,7 +26,7 @@ axiosInstance.interceptors.request.use(
         return config
     },
     (err) => Promise.reject(err)
-)
+);
 
 export const apiHelper = axiosInstance;
 export const frontAPIHelper = frontAxiosInstance;

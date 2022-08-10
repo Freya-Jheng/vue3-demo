@@ -19,21 +19,12 @@
                 <h5 class="apply-camp__content__form__sub-title sub-title">＊請選擇營會類別：</h5>
                 <form @submit.prevent.stop="applyChurchCamp" class="apply-camp__content__form__content">
                     <div class="apply-camp__content__form__content__categories">
-                        <div class="apply-camp__content__form__content__categories__first">
-                            <input type="radio" value="1" id="first-input" v-model="applyInform.campId"
+                        <div v-for="camp in GsFamily.frontCamps" :key="camp.id"
+                            class="apply-camp__content__form__content__categories__first">
+                            <input v-model="applyInform.campId" type="radio" :value="camp.id"
                                 class="apply-camp__content__form__content__categories__first__input" />
-                            <!-- <label class="apply-camp__content__form__content__categories__first__label"
-                                for="first-input">
-                            </label> -->
-                            <span class="apply-camp__content__form__content__categories__first__text">盟約夫婦日營</span>
-                        </div>
-                        <div class="apply-camp__content__form__content__categories__second">
-                            <input type="radio" value="2" id="second-input" v-model="applyInform.campId"
-                                class="apply-camp__content__form__content__categories__second__input" />
-                            <!-- <label class="apply-camp__content__form__content__categories__second__label"
-                                for="second-input">
-                            </label> -->
-                            <span class="apply-camp__content__form__content__categories__second__text">愛在家夫婦日營</span>
+                            <span class="apply-camp__content__form__content__categories__first__text">{{ camp.title
+                                }}</span>
                         </div>
                     </div>
                     <div class="apply-camp__content__form__content__inform">
@@ -116,7 +107,9 @@
 <script setup>
 import { reactive } from 'vue';
 import frontCampAPI from '../front-page-apis/camp';
+import { useGsFamily } from '../stores/gsfamily';
 
+const GsFamily = useGsFamily();
 const applyInform = reactive({
     churchName: '',
     numbers: '',
@@ -126,6 +119,8 @@ const applyInform = reactive({
     campId: -1,
     address: ''
 });
+
+GsFamily.getAllFrontCamps();
 
 // function
 async function applyChurchCamp() {

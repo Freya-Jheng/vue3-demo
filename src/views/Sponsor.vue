@@ -16,12 +16,12 @@
         </div>
         <h5 class="sponsor__title">線上捐款</h5>
         <div class="sponsor__form">
-                <form @submit.prevent.stop="sponsorPost" class="sponsor__form__content">
-                    <div class="sponsor__form__content__item">
-                        <span class="sponsor__form__content__item__title">捐款人姓名</span>
-                        <input v-model="newSponsor.name" type="text" class="sponsor__form__content__item__input">
-                    </div>
-                    <div class="sponsor__form__content__item">
+            <form @submit.prevent.stop="sponsorPost" class="sponsor__form__content">
+                <div class="sponsor__form__content__item">
+                    <span class="sponsor__form__content__item__title">捐款人姓名</span>
+                    <input v-model="newSponsor.name" type="text" class="sponsor__form__content__item__input">
+                </div>
+                <div class="sponsor__form__content__item">
                     <span class="sponsor__form__content__item__title">金額</span>
                     <input v-model="newSponsor.price" type="number" class="sponsor__form__content__item__input">
                 </div>
@@ -67,15 +67,40 @@ const newSponsor = reactive({
     address: '',
 });
 
+
 // functions
+function randomString(length) {
+    let str = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = length; i > 0; --i) {
+        result += str[Math.floor(Math.random() * str.length)];
+    }
+    return result;
+}
+
+
 async function sponsorPost() {
     try {
+        const randomMerchantTradeNo = randomString(20);
+
         const response = await payMentAPI.postPayment({
             name: newSponsor.name,
             price: newSponsor.price,
             phone: newSponsor.phone,
             address: newSponsor.address,
+            MerchantID: 3002599,
+            MerchantTradeNo: randomMerchantTradeNo,
+            MerchantTradeDate: Date(),
+            PaymentType: 'aio',
+            TotalAmount: newSponsor.price,
+            TradeDesc: 'sponser',
+            ItemName: 'sponser',
+            ReturnURL: 0,
+            ChoosePayment: 'ALL',
+            CheckMacValue: 0,
+            EncryptType: 1,
         })
+
     } catch (err) {
         console.log(err);
     }

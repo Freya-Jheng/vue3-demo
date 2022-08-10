@@ -6,9 +6,19 @@
                 <span class="news__banner__text__title-English">LATEST NEWS</span>
             </div>
         </div>
-        <NavTab />
+        <div class="news__navTab">
+            <ul class="news__navTab__items">
+                <li @click="searchByTagId($event)" class="news__navTab__items__item">
+                    所有營會
+                </li>
+                <li @click="searchByTagId($event)" v-for="item in GsFamily.frontCampsTag" :value="item.id"
+                    :key="item.id" class="news__navTab__items__item">
+                    {{ item.tag }}
+                </li>
+            </ul>
+        </div>
         <div class="news__content">
-            <div v-for="camp in GsFamily.frontCamps" :key="camp.id" class="news__content__card">
+            <div v-for="camp in camps.value" :key="camp.id" class="news__content__card">
                 <div class="news__content__card__left">
                     <span class="news__content__card__left__number">
                         <span v-if="camp.id < 10">0</span>{{ camp.id }}
@@ -19,7 +29,7 @@
                         {{ camp.title }}
                     </span>
                     <span class="news__content__card__right__details">{{ camp.date }}<span>{{ camp.place
-                            }}</span></span>
+                    }}</span></span>
                 </div>
             </div>
         </div>
@@ -28,12 +38,59 @@
 </template>
 
 <script setup>
-import NavTab from '../components/NavTab.vue'
 import Pagination from '../components/Pagination.vue'
 import { reactive } from 'vue';
-import {useGsFamily} from '../stores/gsfamily';
+import { useGsFamily } from '../stores/gsfamily';
+import frontCampAPI from '../front-page-apis/camp';
+
 const GsFamily = useGsFamily();
-GsFamily.getAllFrontCamps();
+const camps = reactive([]);
+const copyCamps = reactive([]);
+
+GsFamily.getAllFrontCampTags();
+
+
+// functions
+function searchByTagId($event) {
+    const e = $event.target;
+    const macthCamps = [];
+
+    camps.value = copyCamps.value;
+    camps.value.forEach((camp) => {
+        if (camp.campTag.id === e.value) {
+            macthCamps.push(camp);
+        }
+    });
+
+    camps.value = macthCamps;
+    if (macthCamps.length === 0 && e.value !== 0) {
+        return alert('目前沒有該營會的項目！');
+    }
+
+    if (e.value === 0) {
+        camps.value = copyCamps.value;
+    }
+};
+
+async function getFrontCamps() {
+    try {
+        const response = await frontCampAPI.getAllCamp();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        camps.value = response.data;
+        copyCamps.value = response.data;
+
+        console.log('get', camps.value);
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+getFrontCamps();
 </script>
 
 <style lang="scss" scoped>
@@ -44,6 +101,7 @@ GsFamily.getAllFrontCamps();
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     &__banner {
         width: 100%;
         height: 40vmin;
@@ -51,7 +109,7 @@ GsFamily.getAllFrontCamps();
         background-position: center center;
         background-size: cover;
         position: relative;
-        
+
         &__text {
             position: absolute;
             top: 50%;
@@ -62,6 +120,7 @@ GsFamily.getAllFrontCamps();
             flex-direction: column;
             align-items: center;
             gap: 10px;
+
             &__title {
                 font-weight: 600;
                 font-size: 0.5rem;
@@ -95,6 +154,41 @@ GsFamily.getAllFrontCamps();
             }
         }
     }
+
+    &__navTab {
+        width: 90%;
+        max-width: 569px;
+        margin-top: 8%;
+        font-size: 0.7rem;
+        font-weight: 600;
+
+        @media (min-width: 768px) {
+            font-size: 1.125rem;
+        }
+
+        &__items {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+
+            &__item {
+                width: 30%;
+                max-width: 145px;
+                height: 35px;
+                border-radius: 30px;
+                text-align: center;
+                line-height: 35px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: var(--button-color);
+                    color: var(--sub-font-color);
+                }
+            }
+        }
+    }
+
     &__content {
         width: 73%;
         margin-top: 6.3vw;
@@ -112,59 +206,59 @@ GsFamily.getAllFrontCamps();
             max-height: 61px;
             display: flex;
             flex-direction: row;
-                color: var(--news-title-color);
-            
-                &__left {
-                    font-size: 0.78rem;
+            color: var(--news-title-color);
+
+            &__left {
+                font-size: 0.78rem;
+                font-weight: 600;
+
+                @media (min-width: 768px) {
+                    font-size: 1.125rem;
+                }
+
+                &__number {
+                    position: relative;
+                    margin-right: 57px;
+
+                    &::after {
+                        position: absolute;
+                        content: '';
+                        top: 140%;
+                        right: 50%;
+                        transform: translateX(50%);
+                        width: 0px;
+                        height: 30px;
+                        border: 0.5px solid var(--news-line-color);
+                    }
+                }
+            }
+
+            &__right {
+                display: flex;
+                flex-direction: column;
+
+                &__title {
+                    font-size: 0.88rem;
                     font-weight: 600;
-            
+                    margin-bottom: 4px;
+
                     @media (min-width: 768px) {
                         font-size: 1.125rem;
                     }
-            
-                    &__number {
-                        position: relative;
-                        margin-right: 57px;
-            
-                        &::after {
-                            position: absolute;
-                            content: '';
-                            top: 140%;
-                            right: 50%;
-                            transform: translateX(50%);
-                            width: 0px;
-                            height: 30px;
-                            border: 0.5px solid var(--news-line-color);
-                        }
+                }
+
+                &__details {
+                    font-size: 0.75rem;
+                    font-weight: 300;
+                    color: var(--main-font-color);
+
+                    @media (min-width: 768px) {
+                        font-size: 0.8125rem;
                     }
                 }
-            
-                &__right {
-                    display: flex;
-                    flex-direction: column;
-            
-                    &__title {
-                        font-size: 0.88rem;
-                        font-weight: 600;
-                        margin-bottom: 4px;
-            
-                        @media (min-width: 768px) {
-                            font-size: 1.125rem;
-                        }
-                    }
-            
-                    &__details {
-                        font-size: 0.75rem;
-                        font-weight: 300;
-                        color: var(--main-font-color);
-            
-                        @media (min-width: 768px) {
-                            font-size: 0.8125rem;
-                        }
-                    }
-            
-                }
+
             }
-            }
-            }
+        }
+    }
+}
 </style>

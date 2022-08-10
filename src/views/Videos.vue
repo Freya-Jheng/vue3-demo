@@ -41,6 +41,7 @@ const searchKeyword = ref('');
 function searchCourses() {
     const newC = [];
 
+
     if (!searchKeyword.value.trim()) {
         videos.value = copyVideos.value;
         searchKeyword.value = '';
@@ -48,16 +49,13 @@ function searchCourses() {
         return;
     };
 
-    if(!videos.value.includes(searchKeyword.value)) {
-        return alert (`找不到${searchKeyword.value}，請搜尋其他關鍵字！`);
-    };
-
     videos.value = copyVideos.value;
     videos.value.forEach((video) => {
         if (video.name === searchKeyword.value) {
             newC.push(video);
-        };
+        }
     });
+
     videos.value = newC;
 };
 

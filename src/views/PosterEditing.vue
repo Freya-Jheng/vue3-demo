@@ -1,8 +1,9 @@
 <template>
     <div class="poster-editing">
-        <div class="poster-editing__cover">
-            <h5 class="poster-editing__cover__title">愛在家夫婦日營</h5>
-            <img src="../assets/poster1.png" alt="" class="poster-editing__cover__image" />
+        <div v-for="item in currentPoster" class="poster-editing__cover">
+            <h5 class="poster-editing__cover__title">{{ item.title }}</h5>
+            <img :src="item.path" alt="" class="poster-editing__cover__image" />
+            <canvas id="posterCanva" class="poster-canva"></canvas>
         </div>
         <form class="poster-editing__form">
             <div class="poster-editing__form__item wrapper">
@@ -10,33 +11,124 @@
                     日期
                 </span>
                 <div class="poster-editing__form__item__outer">
-                    <input class="poster-editing__form__item__outer__input date input" type="date" placeholder="" />
+                    <input v-model="newPoster.date" class="poster-editing__form__item__outer__input date input"
+                        type="date" placeholder="" />
                 </div>
             </div>
             <div class="poster-editing__form__item">
                 <span class="poster-editing__form__item__title">時間</span>
-                <input type="text" class="poster-editing__form__item__input">
+                <input v-model="newPoster.time" type="text" class="poster-editing__form__item__input">
             </div>
             <div class="poster-editing__form__item">
                 <span class="poster-editing__form__item__title">費用</span>
-                <input type="text" class="poster-editing__form__item__input">
+                <input v-model="newPoster.price" type="number" class="poster-editing__form__item__input">
             </div>
             <div class="poster-editing__form__item">
                 <span class="poster-editing__form__item__title">地點</span>
-                <input type="text" class="poster-editing__form__item__input">
+                <input v-model="newPoster.place" type="text" class="poster-editing__form__item__input">
             </div>
             <div class="poster-editing__form__item">
                 <span class="poster-editing__form__item__title">請洽</span>
-                <input type="text" class="poster-editing__form__item__input">
+                <input v-model="newPoster.contactor" type="text" class="poster-editing__form__item__input">
             </div>
-            <div class="poster-editing__form__download">
-                <a href="../assets/arrow-black.png" download class="poster-editing__form__download__button">
+            <button type="submit" class="poster-editing__form__download">
+                <a href="../assets/截圖 2022-08-04 下午7.30.04.png" download class="poster-editing__form__download__button">
                     下載
                 </a>
-            </div>
+            </button>
         </form>
     </div>
 </template>
+
+<script setup>
+import { reactive, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import frontPostAPI from '../front-page-apis/poster';
+
+const route = useRoute();
+const a = ref('poster1')
+const currentPoster = reactive({});
+const posters = reactive([
+    {
+        id: 1,
+        title: '愛在家夫婦日營',
+        path: '/src/assets/poster1.png',
+    },
+    {
+        id: 2,
+        title: '愛在家夫婦日營',
+        path: '/src/assets/poster2.png',
+    },
+    {
+        id: 3,
+        title: '愛在家夫婦日營',
+        path: '/src/assets/poster3.png',
+    },
+    {
+        id: 4,
+        title: '愛在家夫婦日營',
+        path: '/src/assets/poster4.png',
+    },
+    {
+        id: 5,
+        title: '愛在家夫婦日營',
+        path: '/src/assets/poster5.png',
+    },
+    {
+        id: 6,
+        title: '愛在家夫婦日營',
+        path: '/src/assets/poster6.png',
+    }
+]);
+const newPoster = reactive({
+    date: '',
+    time: '',
+    price: 0,
+    place: '',
+    contactor: '',
+})
+
+// functions
+function renderPoster() {
+    const currentPosterId = route.params.id;
+
+    posters.forEach((poster) => {
+        if (poster.id === Number(currentPosterId)) {
+            currentPoster.value = poster;
+        };
+    });
+};
+
+function drawPoster() {
+    let canvas = document.getElementById('posterCanva');
+    // let context = canvas.getContext('2d');
+
+};
+
+drawPoster();
+
+async function addPoster() {
+    try {
+        const response = await frontPostAPI.addPoster({
+            date: newPoster.date,
+            time: newPoster.time,
+            price: newPoster.price,
+            place: newPoster.place,
+            contactor: newPoster.contactor,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        console.log(response);
+    } catch (err) {
+        console.log(err);
+    };
+}
+
+renderPoster();
+</script>
 
 <style scoped lang="scss">
 .poster-editing {
@@ -64,6 +156,8 @@
         width: 70%;
         max-width: 569px;
         text-align: center;
+        position: relative;
+
         @media screen and (min-width: 768px) {
             width: 60%;
         }
@@ -76,7 +170,7 @@
             @media screen and (min-width: 768px) {
                 font-size: 1.008rem;
                 margin-bottom: 27.75px;
-                
+
             }
 
             @media screen and (min-width: 1024px) {
@@ -87,6 +181,16 @@
 
         &__image {
             width: 100%;
+        }
+
+        #posterCanva {
+            position: absolute;
+            top: 35px;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: 1px solid red;
+            // background-color: pin;
         }
     }
 
@@ -193,6 +297,7 @@
             display: flex;
             justify-content: flex-end;
             padding: 0;
+
             &__button {
                 width: 50%;
                 max-width: 183.39px;

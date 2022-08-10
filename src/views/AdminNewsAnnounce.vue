@@ -2,14 +2,14 @@
     <form @submit.prevent.stop="addCamp()" class="admin-home__content__news__announce">
         <select v-model="newCamp.campTagId" name="" id="" class="admin-home__content__news__announce__category">
             <option value="">選擇營會分類</option>
-            <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{tag.tag}}</option>
+            <option v-for="tag in GsFamily.campTags" :value="tag.id" :key="tag.id">{{ tag.tag }}</option>
         </select>
         <div class="admin-home__content__news__announce__date">
             <input v-model="newCamp.date" type="date">
         </div>
         <input type="text" v-model="newCamp.title" class="admin-home__content__news__announce__title" placeholder="標題">
-        <quill-editor v-model:content="newCamp.content" content-type="text" placeholder="請輸入內容..." theme="snow" toolbar="essential"
-            style="height: 463px;" class="quill" />
+        <quill-editor v-model:content="newCamp.content" content-type="text" placeholder="請輸入內容..." theme="snow"
+            toolbar="essential" style="height: 463px;" class="quill" />
         <button type="submit">發布營會</button>
     </form>
 </template>
@@ -21,8 +21,8 @@ import campAPI from '../apis/camp';
 import { reactive } from 'vue';
 import { useGsFamily } from '../stores/gsfamily';
 const GsFamily = useGsFamily();
-GsFamily.getTags()
-
+const now = new Date();
+let formatted_date = '';
 const newCamp = reactive({
     title: '',
     campTagId: '',
@@ -30,10 +30,29 @@ const newCamp = reactive({
     content: '',
 })
 
+GsFamily.getTags()
+
 // functions
+function formatDate(date) {
+    if ((date.getMonth() + 1) < 10) {
+        formatted_date = date.getFullYear() + "-" + '0' + (date.getMonth() + 1) + "-" + date.getDate();
+    } else if ((date.getMonth() + 1) >= 10) {
+        formatted_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+};
 
 async function addCamp() {
     try {
+        formatDate(now);
+
+        if (!newCamp.title.trim() || !newCamp.date.trim() || !newCamp.content.trim()) {
+            return alert('請填寫資料！')
+        }
+
+        if (newCamp.date < formatted_date) {
+            return alert(`日期需要在${ formatted_date }之後`);
+        };
+
         let re = /-/gi;
         const quill = document.querySelector('.quill')
         const response = await campAPI.addNewCamp({
@@ -47,9 +66,20 @@ async function addCamp() {
             throw new Error(response.data.statusCode)
         }
 
-        if(response.data.statusCodeValue === 200) {
+        if (response.data.statusCodeValue === 200) {
             alert('新增成功！請前往管理消息區瀏覽')
         }
+
+        // const now = new Date();
+        // let formatted_date = '';
+
+        // const formatDate = (date) => {
+        //     if ((date.getMonth() + 1) < 10) {
+        //         formatted_date = date.getFullYear() + "-" + '0' + (date.getMonth() + 1) + "-" + date.getDate();
+        //     } else if ((date.getMonth() + 1) >= 10) {
+        //         formatted_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        //     }
+        // }
 
         newCamp.campTagId = '';
         newCamp.date = '';

@@ -1,11 +1,20 @@
 <template>
-    <NavTab />
+    <!-- <NavTab /> -->
+    <div class="navTab">
+        <ul class="navTab__items" id="tags">
+            <li @click="searchByTagId($event)" class="navTab__items__item">
+                所有消息
+            </li>
+            <li @click="searchByTagId($event)" v-for="item in GsFamily.frontArticlesTag" :value="item.id" :key="item.id"
+                class="navTab__items__item">
+                {{ item.tag }}
+            </li>
+        </ul>
+    </div>
     <div class="stories__content">
-        <div v-for="story in GsFamily.frontArticles" :key="story.id" class="stories__content__card">
+        <div v-for="story in articles.value" :key="story.id" class="stories__content__card">
             <div class="stories__content__card__left">
-                <!-- <img :src="`data:application/image;base64,${story.image}`" alt="image"
-                    class="stories__content__card__left__image"> -->
-                <img src="../assets/default-image.png" alt="">
+                <img :src="story.fileBytes" alt="">
             </div>
             <div class="stories__content__card__right">
                 <h6 class="stories__content__card__right__title">
@@ -25,32 +34,101 @@
 </template>
 
 <script setup>
-import NavTab from '../components/NavTab.vue';
 import { useGsFamily } from '../stores/gsfamily';
 import frontArticleAPI from '../front-page-apis/article';
+import { reactive, ref } from 'vue';
 
 const GsFamily = useGsFamily();
+const articles = reactive([]);
+const copyArticles = reactive([]);
+
 GsFamily.getAllFrontArticles();
+GsFamily.getAllFrontArticleTags();
 
 // functions
-async function getImage(id) {
-    try {
-        const response = await frontArticleAPI.getArticleImage({ id });
+function searchByTagId($event) {
+    const e = $event.target;
+    const macthArticles = [];
 
-        console.log(response);
+    articles.value = copyArticles.value;
+    articles.value.forEach((article) => {
+        if (article.articleTagView.id === e.value) {
+            macthArticles.push(article);
+        }
+    });
+
+    articles.value = macthArticles;
+
+    if (macthArticles.length === 0 && e.value !== 0) {
+        return alert('目前沒有該營會的項目！');
+    }
+
+    if (e.value === 0) {
+        articles.value = copyArticles.value;
+    }
+};
+
+async function getFrontArticles() {
+    try {
+        const response = await frontArticleAPI.getAllArticles();
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        articles.value = response.data;
+        copyArticles.value = response.data;
+
     } catch (err) {
         console.log(err);
     }
 }
+getFrontArticles();
 </script>
 
 <style scoped lang="scss">
+.navTab {
+    width: 90%;
+    max-width: 569px;
+    margin-top: 8%;
+    font-size: 0.7rem;
+    font-weight: 600;
+
+    @media (min-width: 768px) {
+        font-size: 1.125rem;
+    }
+
+    &__items {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+
+        &__item {
+            width: 30%;
+            max-width: 145px;
+            height: 35px;
+            border-radius: 30px;
+            text-align: center;
+            line-height: 35px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--button-color);
+                color: var(--sub-font-color);
+            }
+        }
+    }
+}
+
 .stories__content {
     width: 80%;
     height: 100vh;
     margin-top: 5vw;
     margin-bottom: 130px;
     margin-bottom: 50vh;
+    display: flex;
+    flex-direction: column;
 
     @media (min-width: 768px) {
         display: grid;

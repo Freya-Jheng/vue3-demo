@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue';
 import WebHome from '../views/WebHome.vue';
 import Poster from '../views/Poster.vue';
+import Story from '../views/Story.vue';
 import AdminLogin from '../views/AdminLogin.vue';
 import AdminHome from '../views/AdminHome.vue';
 import NotFound from '../views/NotFound.vue';
@@ -28,10 +29,10 @@ const router = createRouter({
         {
           path: 'story',
           name: 'story',
-          component: () => import('../views/Story.vue'),
+          component: Story,
           children: [
             {
-              path: '',
+              path: 'all',
               name: 'all-stories',
               component: () => import('../views/AllStories.vue')
             },
@@ -88,7 +89,7 @@ const router = createRouter({
               component: () => import('../views/PosterList.vue')
             },
             {
-              path: 'editing',
+              path: 'editing/:id',
               name: 'poster-editing',
               component: () => import('../views/PosterEditing.vue')
             }

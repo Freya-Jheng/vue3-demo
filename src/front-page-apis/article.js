@@ -1,13 +1,16 @@
-import { apiHelper } from "../utili/helper";
+import { frontAPIHelper } from "../utili/helper";
 
 export default {
     getAllArticles() {
-        return apiHelper.get('/front/article');
+        return frontAPIHelper.get('/front/article');
     },
     getArticle({ id }) {
-        return apiHelper.get(`/front/article/${ id }`);
+        return frontAPIHelper.get(`/front/article/${id}`);
     },
     getArticleImage({ id }) {
-        return apiHelper.get(`/front/article/browse/${ id }`);
+        return frontAPIHelper.get(`/front/article/browse/${id}`);
     },
+    getArtcleTags() {
+        return frontAPIHelper.get('/front/article/tag');
+    }
 }

@@ -1,22 +1,22 @@
 <template>
     <div class="individual-story">
         <div class="individual-story__text">
-            <span class="individual-story__text__date">{{ article.value.date }}</span>
+            <span class="individual-story__text__date">{{ article.date }}</span>
             <br>
-            <span class="individual-story__text__title">{{ article.value.title }}</span>
+            <span class="individual-story__text__title">{{ article.title }}</span>
         </div>
         <div class="individual-story__content">
-            {{ article.value.content }}
+            {{ article.content }}
         </div>
     </div>
 </template>
 
 <script setup>
 import frontArticleAPI from '../front-page-apis/article';
-import { reactive } from 'vue';
+import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-const article = reactive([]);
+const article = ref([]);
 const route = useRoute();
 
 // functions
@@ -31,7 +31,8 @@ async function getArticle() {
     };
 
     article.value = response.data;
-    console.log(response);
+
+    console.log(article.value)
 }
 
 getArticle();

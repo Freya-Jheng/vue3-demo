@@ -32,8 +32,8 @@
                         <td>{{ list.title }}</td>
                         <td>
                             <div class="cover-image-dispay">
-                                <img src="http://139.162.85.127:8080/backend/admin/article/browse/1" alt="" />
-                                <!-- <img src="../assets/default-image.png" alt=""> -->
+                                <img :src="list.fileBytes" alt="" />
+                                <img v-if="list.fileBytes.length === 0" src="../assets/default-image.png" alt="">
                             </div>
                         </td>
                         <td>
@@ -67,7 +67,7 @@
                         <select class="course-management__category select">
                             <option value="">選擇文章類別</option>
                             <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id"> {{ item.tag
-                                }}
+                            }}
                             </option>
                         </select>
                         <div class="course-management__picture input">
@@ -112,7 +112,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent.stop="addArticles" class="course-management">
+                    <form @submit.prevent.stop="addArticles" enctype="multipart/form-data" class="course-management">
                         <div class="course-management__name input">
                             <span>標題</span>
                             <input v-model="newArticle.title" type="text">
@@ -121,7 +121,7 @@
                             class="course-management__category select">
                             <option value="">選擇文章類別</option>
                             <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id"> {{ item.tag
-                                }}
+                            }}
                             </option>
                         </select>
                         <div class="course-management__picture input">
@@ -192,7 +192,7 @@ function modalResize() {
 };
 function handleFileChange($event) {
     const { files } = $event.target;
-    console.log(files[0]);
+
     newFiles.value = files[0];
     if (files.length <= 0) {
         fileCover.value = '';
@@ -231,23 +231,6 @@ async function getArticles() {
         const token = localStorage.getItem('token');
 
         lists.value = { ...response.data };
-        let link = lists.value[0].file;
-        console.log(lists.value[0].file);
-        src.value = lists.value[0].file;
-
-        axios({
-            method: 'GET',
-            url: link,
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then(function (response) {
-                src.value = response;
-            })
-            .catch(function (error) {
-                console.log('錯誤', error);
-            });
 
     } catch (err) {
         console.log(err)
@@ -306,7 +289,8 @@ async function getImage(id) {
 };
 async function addArticles() {
     try {
-        const file = newFiles.value;
+        let file = newFiles.value;
+
         const dto = {
             title: newArticle.title,
             articleTagId: newArticle.articleTagId,
@@ -326,7 +310,7 @@ async function addArticles() {
     }
 };
 getArticles();
-// getImage(1);
+
 
 </script>
 

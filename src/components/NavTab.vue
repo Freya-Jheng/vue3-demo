@@ -5,7 +5,7 @@
                 所有營會
             </li>
             <li v-for="item in navTabs.value" :key="item.id" class="navTab__items__item">
-                {{item.tag}}
+                {{ item.tag }}
             </li>
         </ul>
     </div>
@@ -17,6 +17,19 @@ import frontCampAPI from '../front-page-apis/camp';
 
 const navTabs = reactive([]);
 
+const props = defineProps({
+    campTagId: {
+        type: Number,
+        required: true,
+    },
+});
+const emit = defineEmits(['update:campTagId']);
+
+const updateTagId = (value) => {
+    emit('update:campTagId', value);
+    console.log(value);
+};
+
 // functions
 async function getAllTags() {
     try {
@@ -25,9 +38,9 @@ async function getAllTags() {
         if (response.status !== 200) {
             throw new Error(response.status);
         };
-        
+
         navTabs.value = response.data;
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -42,14 +55,17 @@ getAllTags();
     margin-top: 8%;
     font-size: 0.7rem;
     font-weight: 600;
+
     @media (min-width: 768px) {
         font-size: 1.125rem;
     }
+
     &__items {
         display: flex;
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
+
         &__item {
             width: 30%;
             max-width: 145px;
@@ -58,6 +74,7 @@ getAllTags();
             text-align: center;
             line-height: 35px;
             cursor: pointer;
+
             &:hover {
                 background-color: var(--button-color);
                 color: var(--sub-font-color);

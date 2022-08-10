@@ -20,21 +20,12 @@
                 <h5 class="join-camp__content__form__sub-title sub-title">＊請選擇營會類別：</h5>
                 <form @submit.prevent.stop="applyPersonalCamp" class="join-camp__content__form__content">
                     <div class="join-camp__content__form__content__categories">
-                        <div class="join-camp__content__form__content__categories__first">
-                            <input type="radio" value="1" id="first-input" v-model="applyInform.campId"
+                        <div v-for="tag in GsFamily.frontCamps" :key="tag.id"
+                            class="join-camp__content__form__content__categories__first">
+                            <input v-model="applyInform.campId" type="radio" :value="tag.id"
                                 class="join-camp__content__form__content__categories__first__input" />
-                            <!-- <label class="join-camp__content__form__content__categories__first__label"
-                                for="first-input">
-                            </label> -->
-                            <span class="join-camp__content__form__content__categories__first__text">盟約夫婦日營</span>
-                        </div>
-                        <div class="join-camp__content__form__content__categories__second">
-                            <input value="2" type="radio" id="second-input" v-model="applyInform.campId"
-                                class="join-camp__content__form__content__categories__second__input" />
-                            <!-- <label class="join-camp__content__form__content__categories__second__label"
-                                for="second-input">
-                            </label> -->
-                            <span class="join-camp__content__form__content__categories__second__text">愛在家夫婦日營</span>
+                            <span class="join-camp__content__form__content__categories__first__text">{{ tag.title
+                            }}</span>
                         </div>
                     </div>
                     <div class="join-camp__content__form__content__inform">
@@ -79,16 +70,20 @@
         </div>
     </div>
 </template>
+
 <script setup>
 import { reactive } from 'vue';
 import frontCampAPI from '../front-page-apis/camp';
+import { useGsFamily } from '../stores/gsfamily';
+
+const GsFamily = useGsFamily();
 const applyInform = reactive({
     personalName: '',
-    phone:  '',
+    phone: '',
     email: '',
     campId: -1,
-})
-let id = 1
+});
+let id = 1;
 const guides = reactive([
     {
         id: id++,
@@ -102,7 +97,9 @@ const guides = reactive([
         id: id++,
         content: '因地區不同，費用有些差異，詳請洽協會。'
     },
-])
+]);
+
+GsFamily.getAllFrontCamps();
 
 // functions 
 async function applyPersonalCamp() {
@@ -127,11 +124,11 @@ async function applyPersonalCamp() {
         }
 
         applyInform.personalName = '',
-        applyInform.phone = '',
-        applyInform.email = '',
-        applyInform.campId = -1
+            applyInform.phone = '',
+            applyInform.email = '',
+            applyInform.campId = -1
 
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     };
 };
@@ -141,10 +138,12 @@ async function applyPersonalCamp() {
 .join-camp {
     width: 100%;
     margin-top: 36px;
-    background-color:rgba(196, 196, 196, 0.1);
+    background-color: rgba(196, 196, 196, 0.1);
+
     @media (min-width: 768px) {
         padding-bottom: 172px;
     }
+
     &__banner {
         width: 100%;
         height: 40vmin;
