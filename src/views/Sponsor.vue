@@ -16,7 +16,7 @@
         </div>
         <h5 class="sponsor__title">線上捐款</h5>
         <div class="sponsor__form">
-            <form @submit.prevent.stop="sponsorPost" class="sponsor__form__content">
+            <form @submit.prevent.stop="getInfrom" class="sponsor__form__content">
                 <div class="sponsor__form__content__item">
                     <span class="sponsor__form__content__item__title">捐款人姓名</span>
                     <input v-model="newSponsor.name" type="text" class="sponsor__form__content__item__input">
@@ -54,10 +54,13 @@
             </div>
         </div>
     </div>
+    <div id="payMent">
+
+    </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import payMentAPI from '../front-page-apis/payMent';
 
 const newSponsor = reactive({
@@ -69,55 +72,29 @@ const newSponsor = reactive({
 
 
 // functions
-function randomString(length) {
-    let str = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let result = '';
-    for (let i = length; i > 0; --i) {
-        result += str[Math.floor(Math.random() * str.length)];
-    }
-    return result;
-}
-
-
-async function sponsorPost() {
+async function getInfrom() {
     try {
-        const randomMerchantTradeNo = randomString(20);
-
-        const response = await payMentAPI.postPayment({
+        const payMent = document.getElementById('payMent');
+        const response = await payMentAPI.getInform({
             name: newSponsor.name,
             price: newSponsor.price,
             phone: newSponsor.phone,
-            address: newSponsor.address,
-            MerchantID: 3002599,
-            MerchantTradeNo: randomMerchantTradeNo,
-            MerchantTradeDate: Date(),
-            PaymentType: 'aio',
-            TotalAmount: newSponsor.price,
-            TradeDesc: 'sponser',
-            ItemName: 'sponser',
-            ReturnURL: 0,
-            ChoosePayment: 'ALL',
-            CheckMacValue: 0,
-            EncryptType: 1,
-        })
+            address: newSponsor.address
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        payMent.innerHTML = response.data;
+
+        const payMentForm = document.getElementById('allPayAPIForm');
+        payMentForm.submit();
 
     } catch (err) {
         console.log(err);
-    }
-}
-// const api = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
-// const payMent = axios.post('https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5', {
-//     name: newSponsor.name,
-//     price: newSponsor.price,
-//     phone: newSponsor.phone,
-//     address: newSponsor.address,
-// })
-//     .then(function (response) {
-//         console.log(response);
-//     })
-//     .catch(function (err) {
-//         console.log(err);
-//     })
+    };
+};
 
 </script>
 

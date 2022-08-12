@@ -83,8 +83,6 @@ async function getFrontCamps() {
         camps.value = response.data;
         copyCamps.value = response.data;
 
-        console.log('get', camps.value);
-
     } catch (err) {
         console.log(err);
     }

@@ -25,7 +25,8 @@
                         <td>{{ list.name }}</td>
                         <td>
                             <div class="cover-image-dispay">
-                                <img src="../assets/default-image.png" alt="">
+                                <img v-if="!list.imageBytes" src="../assets/default-image.png" alt="">
+                                <img v-if="list.imageBytes" :src="list.imageBytes" alt="">
                             </div>
                         </td>
                         <td>
@@ -51,21 +52,26 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="course-management">
+                    <form @submit.prevent.stop="editVideoDto" class="course-management">
                         <div class="course-management__name input">
                             <span>影片名稱</span>
-                            <input v-model="video.name" type="text">
+                            <input v-model="editVideo.name" type="text">
                         </div>
-                        <div class="course-management__picture input">
+                        <label for="edit-cover-image" class="course-management__picture input">
                             <span>圖片</span>
-                            <img src="@/assets/default-image.png" alt="cover-image" class="cover-image">
-                        </div>
+                            <img v-if="!editVideo.imageBytes" src="@/assets/default-image.png" alt="cover-image"
+                                class="cover-image">
+                            <img v-if="editVideo.imageBytes" :src="editVideo.imageBytes" alt="" class="cover-image">
+                        </label>
+                        <input @change="handleImageChange($event)" type="file" id="edit-cover-image" accept="image/*"
+                            style="display: none;">
                         <div class="course-management__file input">
                             <span>上傳檔案</span>
-                            <input type="file" name="image" id="image">
+                            <input @change="handleFileChange($event)" type="file" name="image" id="image"
+                                accept="video/*">
                         </div>
                         <div class="course-management__wrapper">
-                            <button type="submit" class="course-management__wrapper__submit">新增</button>
+                            <button type="submit" class="course-management__wrapper__submit">儲存</button>
                             <button type="button" class="course-management__wrapper__cancel"
                                 data-dismiss="modal">取消</button>
                         </div>
@@ -88,22 +94,22 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="course-management">
+                    <form @submit.prevent.stop="addVideosDto" class="course-management">
                         <div class="course-management__name input">
                             <span>影片名稱</span>
-                            <input v-model="newArticle.title" type="text">
+                            <input v-model="newName" type="text">
                         </div>
-                        <div class="course-management__picture input">
+                        <label for="add-cover-image" class="course-management__picture input">
                             <span>圖片</span>
-                            <img src="@/assets/default-image.png" alt="cover-image-default" class="cover-image">
-                            <video autoplay muted class="cover-image" id="preview-add">
-                                <source src="" type="image/png" id="source" />
-                            </video>
-                            <!-- <div id="videoarea" class="cover-image" ></div> -->
-                        </div>
+                            <img v-if="!newFileCoverImage" src="@/assets/default-image.png" alt="cover-image-default"
+                                class="cover-image">
+                            <img v-if="newFileCoverImage" :src="newFileCoverImage" alt="" class="cover-image">
+                        </label>
+                        <input @change="handleImageChange($event)" id="add-cover-image" type="file" accept="image/*"
+                            style="display: none;">
                         <div class="course-management__file input">
                             <span>上傳檔案</span>
-                            <input @change="handleFileChange($event)" type="file">
+                            <input @change="handleFileChange($event)" type="file" accept="video/*">
                         </div>
                         <div class="course-management__wrapper">
                             <button type="submit" class="course-management__wrapper__submit">新增</button>
@@ -123,21 +129,17 @@ import { reactive, ref } from 'vue';
 import videoAPI from '../apis/video';
 
 const lists = reactive([]);
-const newArticle = reactive({
-    title: '',
-    articleTagId: '',
-    date: Date(),
-    content: '',
-    keywords: '',
-    narrative: ''
-});
-const video = ref({});
-const file = ref('');
-const fileCover = ref('');
+const newName = ref('');
+const editVideo = ref({});
 const widthModal = ref('');
-let src = '';
 const searchKeyword = ref('');
 const copyLists = reactive([]);
+const newFile = reactive([]);
+const editFile = reactive({});
+const newFileImage = reactive([]);
+const newFileCoverImage = ref('');
+
+
 
 // functions
 function modalResize() {
@@ -145,9 +147,9 @@ function modalResize() {
     let width = (windowWidth - 800) / 2 + 'px';
     widthModal.value = width
 };
-
 function searchVideos() {
     if (!searchKeyword.value.trim()) {
+        lists.value = copyLists.value;
         return alert('請輸入搜尋關鍵字！');
     };
 
@@ -162,37 +164,110 @@ function searchVideos() {
 
     lists.value = listsAfterSearch;
 };
+function handleImageChange($event) {
+    const { files } = $event.target;
+    newFileImage.value = files[0];
+    let imageURL = window.URL.createObjectURL(files[0]);
 
+    if ($event.target.id === 'add-cover-image') {
+        newFileCoverImage.value = imageURL;
+    } else if ($event.target.id === 'edit-cover-image') {
+        editVideo.value.imageBytes = imageURL;
+    };
+};
 function handleFileChange($event) {
     const { files } = $event.target;
-    const source = document.querySelector('#source');
-    const video = document.querySelector('#preview-add');
-    video.show();
-    source[0].src = URL.createObjectURL(files);
-    source.parent()[0].load();
-};
 
+    newFile.value = files[0];
+};
 async function getVideos() {
     try {
         const response = await videoAPI.getAllVideos();
 
         if (response.status !== 200) {
-            console.log(response.status);
+            throw new Error(response.status);
         };
 
         lists.value = response.data;
         copyLists.value = response.data;
 
-        console.log(lists.value);
     } catch (err) {
         console.log(err);
     };
 };
+async function addVideosDto() {
+    try {
+        if (!newName.value.trim()) {
+            return alert('請輸入影片名稱！');
+        };
 
+        if (!newFile.value) {
+            return alert('請上傳影片！');
+        };
+
+        const response = await videoAPI.addVideoDto({
+            name: newName.value,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        }
+
+        let currentId = response.data;
+
+        addVideoFile(currentId);
+        addVideoImage(currentId);
+
+        newName.value = '';
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function addVideoFile(id) {
+    try {
+        const response = await videoAPI.addVideoFile({
+            id,
+            file: newFile.value,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('新增影片成功！');
+        };
+
+        getVideos();
+
+        newFile.value = '';
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function addVideoImage(id) {
+    try {
+        const response = await videoAPI.addVideoImage({
+            id,
+            file: newFileImage.value,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('新增成功！');
+        };
+
+        getVideos();
+
+        newFileCoverImage.value = '';
+        newFileImage.value = '';
+    } catch (err) {
+        console.log(err);
+    };
+};
 async function deleteVideos(id) {
     try {
         const response = await videoAPI.deleteVideo({ id });
-        console.log(response);
 
         if (response.status !== 200) {
             throw new Error(response.status);
@@ -204,8 +279,7 @@ async function deleteVideos(id) {
     } catch (err) {
         console.log(err);
     };
-}
-
+};
 async function getVideo(id) {
     try {
         const response = await videoAPI.getVideo({ id });
@@ -214,11 +288,35 @@ async function getVideo(id) {
             throw new Error(response.status);
         };
 
-        video.value = response.data;
+        editVideo.value = response.data;
 
     } catch (err) {
         console.log(err);
     };
+};
+async function editVideoDto() {
+    try {
+        if (!editVideo.value.name.trim()) {
+            return alert('請輸入影片名稱！')
+        };
+        const id = editVideo.value.id;
+        const response = await videoAPI.editVideosDto({
+            id,
+            name: editVideo.value.name
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        addVideoFile(id);
+        addVideoImage(id);
+
+        getVideos();
+
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 getVideos();
@@ -477,6 +575,7 @@ getVideos();
         width: 370px;
         height: 300px;
         object-fit: contain;
+        cursor: pointer;
     }
 
 

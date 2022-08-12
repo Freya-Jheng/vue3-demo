@@ -76,7 +76,6 @@ export const useGsFamily = defineStore('GsFamily', {
       try {
         const response = await frontCampAPI.getAllTags();
         this.frontCampsTag = response.data;
-        console.log(response);
       } catch (err) {
         console.log(err);
       }
@@ -89,8 +88,6 @@ export const useGsFamily = defineStore('GsFamily', {
           throw new Error(response.status);
         };
         this.frontArticles = response.data;
-        this.getImage(response.data[0].id)
-        console.log(response.data, 'article', response)
       } catch (err) {
         console.log(err);
       }
@@ -109,14 +106,5 @@ export const useGsFamily = defineStore('GsFamily', {
         console.log(err);
       }
     },
-    async getImage(id) {
-      try {
-        const response = await frontArticleAPI.getArticleImage({ id });
-
-        // console.log(response);
-      } catch (err) {
-        console.log(err);
-      }
-    }
   }
 })

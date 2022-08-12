@@ -185,7 +185,6 @@ async function frontLogout() {
     try {
         const response = await authorizationAPI.logOut();
         if (response.status !== 200) {
-            console.log(response)
             throw new Error(response.data.message);
         };
 

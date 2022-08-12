@@ -159,7 +159,6 @@ async function logOut() {
     try {
         const response = await authorityAPI.logOut();
         if (response.status !== 200) {
-            console.log(response)
             throw new Error(response.data.message);
         }
         

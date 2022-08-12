@@ -1,8 +1,9 @@
 <template>
     <div class="admin__course">
         <div class="admin__course__search">
-            <input type="text" class="admin__course__navbar__search__input" placeholder="搜尋課程名稱">
-            <button type="button" class="admin__course__navbar__search__button">搜尋</button>
+            <input v-model="searchKeyword" type="text" class="admin__course__navbar__search__input"
+                placeholder="搜尋課程名稱">
+            <button @click="searchVideos" type="button" class="admin__course__navbar__search__button">搜尋</button>
         </div>
         <div class="admin__course__add">
             <button @click="modalResize()" data-toggle="modal" data-target="#add-courses" type="button"
@@ -22,13 +23,14 @@
                         <td>{{ list.name }}</td>
                         <td>
                             <div class="cover-image-dispay">
-                                <img src="@/assets/default-image.png" alt="cover-image" />
+                                <img v-if="!list.imageLocation" src="@/assets/default-image.png" alt="cover-image" />
+                                <img :src="list.imageLocation" alt="">
                             </div>
                         </td>
                         <td>
-                            <button @click="getIndividual(list.id), modalResize()" type="button" class="submit"
+                            <button @click="getCourse(list.id), modalResize()" type="button" class="submit"
                                 data-toggle="modal" :data-id="list.id" data-target="#edit-courses"></button>
-                            <button @click="deleteIndividual(list.id)" type="submit" class="delete"></button>
+                            <button @click="deleteIndividual(list.id)" type="button" class="delete"></button>
                         </td>
                     </tr>
                 </tbody>
@@ -47,18 +49,23 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent.stop="editIndividual(individualList.id)" class=" course-management">
+                    <form @submit.prevent.stop="editCourses(editCourse.id)" class=" course-management">
                         <div class="course-management__name input">
                             <span>課程名稱</span>
-                            <input v-model="newAccount.account" type="text">
+                            <input v-model="editCourse.name" type="text">
                         </div>
-                        <div class="course-management__picture input">
+                        <label for="edit-cover-picture" class="course-management__picture input">
                             <span>圖片</span>
-                            <img src="@/assets/default-image.png" alt="cover-image" class="cover-image">
-                        </div>
+                            <img v-if="!editCourse.imageLocation" src="@/assets/default-image.png" alt="cover-image"
+                                class="cover-image">
+                            <img v-if="editCourse.imageLocation" :src="editCourse.imageLocation" alt="add-cover-picture"
+                                class="cover-image">
+                        </label>
+                        <input @change="handleFormImage($event)" type="file" name="edit-cover-picture"
+                            id="edit-cover-picture" accept="image/png, image/jpeg" style="display: none;">
                         <div class="course-management__file input">
                             <span>上傳檔案</span>
-                            <input type="file" name="image" id="image">
+                            <input @change="handleFormFile($event)" type="file" name="image" id="image" accept=".pdf">
                         </div>
                         <div class="course-management__wrapper">
                             <button type="submit" class="course-management__wrapper__submit">儲存</button>
@@ -84,18 +91,23 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent.stop="addIndividual" class="course-management">
+                    <form @submit.prevent.stop="addCoursesDto" class="course-management">
                         <div class="course-management__name input">
                             <span>課程名稱</span>
-                            <input v-model="newAccount.account" type="text">
+                            <input v-model="newCourseName" type="text">
                         </div>
-                        <div class="course-management__picture input">
+                        <label for="new-cover-picture" class="course-management__picture input">
                             <span>圖片</span>
-                            <img src="@/assets/default-image.png" alt="cover-image" class="cover-image">
-                        </div>
+                            <img v-if="fileCover.length === 0" src="@/assets/default-image.png" alt="cover-image"
+                                class="cover-image">
+                            <img v-if="fileCover.length !== 0" :src="fileCover" alt="add-cover-picture"
+                                class="cover-image">
+                        </label>
+                        <input @change="handleFormImage($event)" type="file" id="new-cover-picture" name="cover-picture"
+                            accept="image/png, image/jpeg" style="display: none;">
                         <div class="course-management__file input">
                             <span>上傳檔案</span>
-                            <input type="file" name="image" id="image">
+                            <input @change="handleFormFile($event)" type="file" name="image" id="image" accept=".pdf">
                         </div>
                         <div class="course-management__wrapper">
                             <button type="submit" class="course-management__wrapper__submit">新增</button>
@@ -115,20 +127,16 @@ import { reactive, ref } from 'vue';
 import coursesAPI from '../apis/courses';
 
 const lists = reactive([]);
-const individualList = ref({
-    id: '',
-    account: '',
-    pwd: '',
-    checkedPwd: '',
-    remark: ''
-});
-const newAccount = ref({
-    account: '',
-    pwd: '',
-    checkedPwd: '',
-    remark: '',
-});
+const copyLists = reactive([]);
+const editCourse = ref({});
+const newCourseName = ref('');
+const now = new Date();
 const widthModal = ref('');
+let formatted_date = '';
+const newFiles = reactive([]);
+const newFilesImage = reactive([]);
+const fileCover = ref('');
+const searchKeyword = ref('');
 
 // functions
 function modalResize() {
@@ -137,6 +145,56 @@ function modalResize() {
     widthModal.value = width
 };
 
+function formatDate(date) {
+    if ((date.getMonth() + 1) < 10) {
+        formatted_date = date.getFullYear() + "-" + '0' + (date.getMonth() + 1) + "-" + date.getDate();
+    } else if ((date.getMonth() + 1) >= 10) {
+        formatted_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+};
+function handleFormImage($event) {
+    const { files } = $event.target;
+
+    newFilesImage.value = files[0];
+
+    if ($event.target.id === 'edit-cover-picture') {
+        if (files.length <= 0) {
+            editCourse.value.imageLocation = '';
+        } else if (files.length >= 0) {
+            const imageURL = window.URL.createObjectURL(files[0]);
+            editCourse.value.imageLocation = imageURL;
+        }
+    } else if ($event.target.id === 'new-cover-picture') {
+        if (files.length <= 0) {
+            fileCover.value = '';
+        } else if (files.length >= 0) {
+            const imageURL = window.URL.createObjectURL(files[0]);
+            fileCover.value = imageURL;
+        }
+    }
+};
+function searchVideos() {
+    let listsAfterSearch = [];
+
+    if (!searchKeyword.value.trim()) {
+        lists.value = copyLists.value;
+        return alert('請輸入搜尋關鍵字！');
+    };
+
+    lists.value = copyLists.value
+
+    lists.value.forEach((list) => {
+        if (list.name === searchKeyword.value) {
+            listsAfterSearch.push(list);
+        };
+    });
+
+    lists.value = listsAfterSearch;
+};
+function handleFormFile($event) {
+    const { files } = $event.target;
+    newFiles.value = files;
+};
 async function getAllCourses() {
     try {
         const response = await coursesAPI.getCourses();
@@ -145,150 +203,137 @@ async function getAllCourses() {
             throw new Error(response.statusText);
         };
 
-        function base64ToArrayBuffer(base64) {
-            var binaryString = window.atob(base64);
-            var binaryLen = binaryString.length;
-            var bytes = new Uint8Array(binaryLen);
-            for (var i = 0; i < binaryLen; i++) {
-                var ascii = binaryString.charCodeAt(i);
-                bytes[i] = ascii;
-            }
-            return bytes;
-        }
-
-        function saveByteArray(reportName, byte) {
-            var blob = new Blob([byte], { type: "application/pdf" });
-            var link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            var fileName = reportName;
-            link.download = fileName;
-            link.click();
-        };
-
-        lists.value = { ...response.data };
-        console.log(lists.value)
-        const file = base64ToArrayBuffer(response.data[0].pdf);
-        // saveByteArray('pdf', file)
+        lists.value = response.data;
+        copyLists.value = response.data;
 
     } catch (err) {
         console.log(err)
     }
 };
-
-async function getIndividual(id) {
+async function getCourse(id) {
     try {
-        const response = await accountAPI.getIndividualTeacher({ id });
-
-        if (response.status !== 200) {
-            throw new Error(response.statusText);
-        }
-        const { account, remark, pwd } = response.data
-        individualList.value = {
-            account,
-            remark,
-            pwd,
+        const response = await coursesAPI.getCourse({
             id
-        }
-
-    } catch (err) {
-        console.log(err);
-    }
-};
-
-async function editIndividual(id) {
-    try {
-
-        if (!individualList.value.account.trim() || !individualList.value.pwd.trim() || !individualList.value.remark.trim()) {
-            return alert('請填寫資料')
-        }
-
-        if (individualList.value.pwd !== individualList.value.checkedPwd) {
-            return alert('密碼與確認密碼不一樣！')
-        }
-
-        const { data } = await accountAPI.editIndividualTeacher({
-            id,
-            account: individualList.value.account,
-            pwd: individualList.value.pwd,
-            remark: individualList.value.remark
-        })
-
-        if (data.statusCodeValue !== 200) {
-            throw new Error(data.statusCode)
-        }
-
-        if (data.statusCodeValue === 200) {
-            alert('修改成功！')
-        }
-
-        const response1 = await accountAPI.getTeacherAccount();
-
-        if (response1.status !== 200) {
-            throw new Error(response1.statusText);
-        };
-
-        lists.value = { ...response1.data };
-
-    } catch (err) {
-        console.log(err);
-    }
-};
-
-async function addIndividual() {
-    try {
-
-        if (!newAccount.value.account.trim() || !newAccount.value.pwd.trim() || !newAccount.value.remark.trim()) {
-            return alert('請填寫資料！')
-        }
-
-        if (newAccount.value.pwd !== newAccount.value.checkedPwd) {
-            return alert('密碼與確認密碼不一樣！')
-        }
-
-        const { data } = await accountAPI.addIndividualTeacher({
-            account: newAccount.value.account,
-            pwd: newAccount.value.pwd,
-            remark: newAccount.value.remark
-        })
-
-        if (data.statusCodeValue !== 200) {
-            throw new Error(data.statusCode)
-        }
-
-        if (data.statusCodeValue === 200) {
-            alert('新增成功')
-        }
-
-        const response1 = await accountAPI.getTeacherAccount();
-
-        if (response1.status !== 200) {
-            throw new Error(response1.statusText);
-        };
-
-        lists.value = { ...response1.data };
-
-    } catch (err) {
-        console.log(err)
-    }
-};
-
-async function deleteIndividual(id) {
-    try {
-        const response = await accountAPI.deleteIndividualTeacher({ id });
+        });
 
         if (response.status !== 200) {
             throw new Error(response.status);
-        }
-
-        alert('刪除成功')
-
-        const response1 = await accountAPI.getTeacherAccount();
-
-        if (response1.status !== 200) {
-            throw new Error(response1.statusText);
         };
 
-        lists.value = { ...response1.data };
+        editCourse.value = response.data;
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function editCourses(id) {
+    try {
+        if (!editCourse.value.name.trim()) {
+            return alert('請輸入課程名稱！');
+        };
+
+        const response = await coursesAPI.editCoursesDto({
+            id,
+            name: editCourse.value.name,
+            date: editCourse.value.date.replaceAll('/', '-'),
+        });
+
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        addCoursesFile(id);
+        addCoursesImage(id);
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function addCoursesDto() {
+    try {
+        const fileLength = newFiles.value.length;
+
+        if (!newCourseName.value.trim()) {
+            return alert('請填寫課程名稱！');
+        };
+
+        if (fileLength === 0) {
+            return alert('請選擇要上傳的檔案！');
+        };
+
+        formatDate(now);
+
+        const response = await coursesAPI.addCoursesDto({
+            name: newCourseName.value,
+            date: formatted_date,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        const currentId = response.data;
+
+        addCoursesFile(currentId);
+        addCoursesImage(currentId);
+
+        newCourseName.value = '';
+        newFiles.value = '';
+
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function addCoursesFile(id) {
+    try {
+
+        const response = await coursesAPI.addCoursesFile({
+            id,
+            file: newFiles.value[0],
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        getAllCourses();
+
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function addCoursesImage(id) {
+    try {
+
+        const response = await coursesAPI.addCoursesImage({
+            id,
+            file: newFilesImage.value,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('新增成功！');
+        };
+
+        getAllCourses();
+
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function deleteIndividual(id) {
+    try {
+        const response = await coursesAPI.deletCourses({ id });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('刪除成功！');
+        };
+
+        getAllCourses();
 
     } catch (err) {
         console.log(err);
@@ -395,6 +440,7 @@ getAllCourses();
             margin: 0 auto;
             width: 130px;
             height: 70px;
+
             img {
                 width: 100%;
                 height: 100%;
@@ -519,6 +565,7 @@ getAllCourses();
         width: 370px;
         height: 300px;
         object-fit: contain;
+        cursor: pointer;
     }
 
 

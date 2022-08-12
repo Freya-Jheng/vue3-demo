@@ -27,7 +27,6 @@ const emit = defineEmits(['update:campTagId']);
 
 const updateTagId = (value) => {
     emit('update:campTagId', value);
-    console.log(value);
 };
 
 // functions

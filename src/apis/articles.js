@@ -7,14 +7,62 @@ export default {
     getArticle({ id }) {
         return apiHelper.get(`/backend/admin/article/${id}`);
     },
-    getArticlesImage({ id }) {
-        return apiHelper.get(`/backend/admin/article/browse/${id}`);
+    addArticleDto({
+        title,
+        articleTagId,
+        date,
+        content,
+        keywords,
+        narrative
+    }) {
+        return apiHelper.post('/backend/admin/article/upload/dto', {
+            title,
+            articleTagId,
+            date,
+            content,
+            keywords,
+            narrative,
+        })
     },
-    addArticles({ dto, file }) {
-        return apiHelper.post('/backend/admin/article', {
-            dto,
+    addArticleFile({ id, file }) {
+        return apiHelper.post(`/backend/admin/article/upload/${id}/file`,
+            {
+                file: file,
+            },
+            {
+                headers: { 'content-type': 'multipart/form-data' }
+            },
+        )
+    },
+    editArticleDto({
+        id,
+        title,
+        articleTagId,
+        date,
+        content,
+        keywords,
+        narrative
+    }) {
+        return apiHelper.put(`/backend/admin/article/${id}`, {
+            title,
+            articleTagId,
+            date,
+            content,
+            keywords,
+            narrative,
+        })
+    },
+    editArticleFile({
+        id,
+        file
+    }) {
+        return apiHelper.put(`/backend/admin/article/${id}/file`, {
             file
-        });
+        },
+            {
+                headers: { 'content-type': 'multipart/form-data' },
+            }
+        )
     },
     deleteArticle({ id }) {
         return apiHelper.delete(`/backend/admin/article/${id}`);

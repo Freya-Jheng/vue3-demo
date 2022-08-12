@@ -83,8 +83,6 @@ async function postContact() {
             file: formData.value,
         });
 
-        console.log(response, 'front-contact');
-
         if (response.status !== 200) {
             throw new Error(response.status)
         };

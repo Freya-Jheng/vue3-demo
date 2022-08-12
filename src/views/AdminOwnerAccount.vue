@@ -234,7 +234,6 @@ async function editIndividual() {
         const roleDTO = {
             roleName: [individualList.value.roleName],
         }
-        console.log(userDTO, roleDTO, 'from editing')
 
         const response = await accountAPI.editIndividualOwner({
             id: individualList.value.id,
@@ -242,7 +241,6 @@ async function editIndividual() {
             roleDTO,
         })
 
-        console.log(userDTO, roleDTO, response, 'from editing')
 
 
         if (response.status !== 200) {

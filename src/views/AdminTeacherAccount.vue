@@ -240,7 +240,6 @@ async function addIndividual() {
             // if ( data.status === 200 ) {
             //     alert('新增成功')
             // }
-            console.log(data)
 
         const response1 = await accountAPI.getTeacherAccount();
 

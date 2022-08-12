@@ -1,7 +1,8 @@
 import { payMentHelper } from "../utili/helper";
+import { apiHelper } from "../utili/helper";
 
 export default {
-    postPayment({ 
+    postPayment({
         name,
         price,
         phone,
@@ -17,7 +18,7 @@ export default {
         ChoosePayment,
         CheckMacValue,
         EncryptType, }) {
-        return payMentHelper.post('',{
+        return payMentHelper.post('', {
             name,
             price,
             phone,
@@ -34,5 +35,18 @@ export default {
             CheckMacValue,
             EncryptType,
         })
-    }
+    },
+    getInform({ name, price, phone, address }) {
+        return apiHelper.post('/front/donate', {
+            name,
+            price,
+            phone,
+            address
+        });
+    },
+    ecpayConnect({ formData }) {
+        return payMentHelper.post('https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5', {
+            formData,
+        })
+    },
 }

@@ -31,8 +31,6 @@ async function getArticle() {
     };
 
     article.value = response.data;
-
-    console.log(article.value)
 }
 
 getArticle();

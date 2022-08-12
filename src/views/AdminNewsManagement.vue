@@ -124,7 +124,7 @@ async function getArticleByCampId() {
         });
 
         if (response.status !== 200) {
-            console.log(response.status);
+            throw new Error(response.status);
         };
 
         lists.value = { ...response.data };

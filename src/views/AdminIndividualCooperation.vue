@@ -110,7 +110,6 @@ async function searchData() {
             personDTO,
         })
 
-        console.log(response);
     } catch (err) {
         console.log(err);
     }
@@ -121,7 +120,6 @@ async function searchDataByCampId() {
             campTagId: searchKeywords.campTagId,
         });
 
-        console.log(response);
     } catch (err) {
         console.log(err);
     };

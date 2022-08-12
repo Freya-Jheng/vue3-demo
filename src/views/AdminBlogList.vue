@@ -59,12 +59,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="course-management">
+                    <form @submit.prevent.stop="editFileDto" class="course-management">
                         <div class="course-management__name input">
                             <span>標題</span>
                             <input v-model="editArticle.title" type="text">
                         </div>
-                        <select class="course-management__category select">
+                        <select v-model="editArticle.articleTagId" class="course-management__category select" name=""
+                            id="">
                             <option value="">選擇文章類別</option>
                             <option v-for="item in GsFamily.articaleTags" :key="item.id" :value="item.id"> {{ item.tag
                             }}
@@ -72,11 +73,13 @@
                         </select>
                         <div class="course-management__picture input">
                             <span>圖片</span>
-                            <img src="@/assets/default-image.png" alt="cover-image" class="cover-image">
+                            <img v-if="!editArticle.fileBytes" src="@/assets/default-image.png" alt="cover-image"
+                                class="cover-image">
+                            <img :src="editArticle.fileBytes" alt="cover-image" class="cover-image">
                         </div>
                         <div class="course-management__file input">
                             <span>上傳檔案</span>
-                            <input type="file" name="image" id="image">
+                            <input @change="handleFileSubmitChange($event)" type="file" name="image" id="image">
                         </div>
                         <div class="course-management__keyword input">
                             <span>關鍵字</span>
@@ -89,7 +92,7 @@
                         <quill-editor v-model:content="editArticle.content" placeholder="請輸入內容..." theme="snow"
                             toolbar="essential" style="height: 463px;" class="quill" />
                         <div class="course-management__wrapper">
-                            <button type="submit" class="course-management__wrapper__submit">新增</button>
+                            <button type="submit" class="course-management__wrapper__submit">儲存</button>
                             <button type="button" class="course-management__wrapper__cancel"
                                 data-dismiss="modal">取消</button>
                         </div>
@@ -106,7 +109,7 @@
         <div class="modal-dialog" :style="{ marginLeft: widthModal }">
             <div class="modal-content teacher-account">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="add-articlesLabel">新增課程</h5>
+                    <h5 class="modal-title" id="add-articlesLabel">新增文章</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -158,7 +161,6 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { reactive, ref } from 'vue';
@@ -176,13 +178,23 @@ const newArticle = reactive({
     keywords: '',
     narrative: ''
 });
-const editArticle = ref({});
-const file = ref('');
+const editArticle = ref({
+    articleTagId: 0,
+    articleTag: '',
+    content: '',
+    date: '',
+    fileBytes: '',
+    id: '',
+    keywords: '',
+    narrative: '',
+    title: '',
+});
 const newFiles = reactive([]);
+const editFiles = reactive([]);
 const fileCover = ref('');
 const widthModal = ref('');
 const seachId = ref('');
-let src = ref('');
+let formatted_date = '';
 
 // functions
 function modalResize() {
@@ -190,10 +202,18 @@ function modalResize() {
     let width = (windowWidth - 800) / 2 + 'px';
     widthModal.value = width
 };
+function formatDate(date) {
+    if ((date.getMonth() + 1) < 10) {
+        formatted_date = date.getFullYear() + "-" + '0' + (date.getMonth() + 1) + "-" + date.getDate();
+    } else if ((date.getMonth() + 1) >= 10) {
+        formatted_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+};
 function handleFileChange($event) {
     const { files } = $event.target;
 
-    newFiles.value = files[0];
+    newFiles.value = files;
+
     if (files.length <= 0) {
         fileCover.value = '';
     } else {
@@ -201,25 +221,17 @@ function handleFileChange($event) {
         fileCover.value = imageURL;
     }
 };
-function fileToByteArray($event) {
+function handleFileSubmitChange($event) {
     const { files } = $event.target;
-    let reader = new FileReader();
-    let fileByteArray = [];
-    reader.readAsArrayBuffer(files[0]);
-    reader.onloadend = function (evt) {
-        if (evt.target.readyState == FileReader.DONE) {
-            let arrayBuffer = evt.target.result,
-                array = new Uint8Array(arrayBuffer);
-            binaryString = String.fromCharCode.apply(null, array)
-            for (let i = 0; i < array.length; i++) {
-                fileByteArray.push(array[i]);
-            }
-        }
-        console.log(binaryString)
-        file.value = { ...fileByteArray }
-        console.log(typeof (fileByteArray), file.value)
-        return fileByteArray
-    }
+
+    editFiles.value = files;
+
+    if (files.length < 0) {
+        editArticle.fileBytes = '';
+    } else {
+        const imageURL = window.URL.createObjectURL(files[0]);
+        editArticle.value.fileBytes = imageURL;
+    };
 };
 async function getArticles() {
     try {
@@ -228,23 +240,36 @@ async function getArticles() {
         if (response.status !== 200) {
             throw new Error(response.status);
         };
-        const token = localStorage.getItem('token');
 
-        lists.value = { ...response.data };
+        lists.value = response.data;
 
     } catch (err) {
         console.log(err)
     }
 };
-async function getArticle(id) {
+async function getArticle(articleId) {
     try {
-        const response = await articlesAPI.getArticle({ id });
+        const response = await articlesAPI.getArticle({
+            id: articleId,
+        });
 
         if (response.status !== 200) {
             throw new Error(response.status);
         };
 
-        editArticle.value = response.data;
+        const { articleTagView, content, date, fileBytes, id, keywords, narrative, title } = response.data;
+        editArticle.value = {
+            articleTagId: articleTagView.id,
+            articleTag: articleTagView.tag,
+            content: content,
+            date: date,
+            fileBytes: fileBytes,
+            id: id,
+            keywords: keywords,
+            narrative: narrative,
+            title: title,
+        };
+
     } catch (err) {
         console.log(err);
     };
@@ -254,9 +279,9 @@ async function deleteArticle(id) {
         const response = await articlesAPI.deleteArticle({ id });
 
         if (response.status !== 200) {
-            console.log(response.status);
+            throw new Error(response.status);
         } else {
-            return alert('刪除成功！');
+            alert('刪除成功！');
         };
 
         getArticles();
@@ -279,39 +304,126 @@ async function searchArticle(id) {
         console.log(err);
     }
 };
-async function getImage(id) {
-    try {
-        const response = await articlesAPI.getArticlesImage({ id });
-        src = response.data;
-    } catch (err) {
-        console.log(err);
-    }
-};
 async function addArticles() {
     try {
-        let file = newFiles.value;
+        let now = new Date();
+        formatDate(now);
 
-        const dto = {
+        const response = await articlesAPI.addArticleDto({
             title: newArticle.title,
             articleTagId: newArticle.articleTagId,
-            date: newArticle.date,
+            date: formatted_date,
             content: newArticle.content,
             keywords: newArticle.keywords,
             narrative: newArticle.narrative
-        }
-
-        const response = await articlesAPI.addArticles({
-            dto,
-            file,
         });
+
+        const currentId = response.data;
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        };
+
+        addFile(currentId);
+
+        getArticles();
+
+        newArticle.title = '';
+        newArticle.articleTagId = 0;
+        formatted_date = '';
+        newArticle.content = '';
+        newArticle.keywords = '';
+        newArticle.narrative = '';
+        fileCover.value = '';
 
     } catch (err) {
         console.log(err);
     }
 };
+async function addFile(id) {
+    try {
+
+        const fileA = newFiles.value;
+
+        const response = await articlesAPI.addArticleFile({
+            id,
+            file: fileA[0]
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else if (response.status === 200) {
+            alert('新增成功');
+        };
+
+        newFiles.value = '';
+
+
+        getArticles();
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+async function editFileDto() {
+    try {
+
+        if (!editArticle.value.title.trim()) {
+            return alert('請填寫資料！')
+        };
+
+        if (editArticle.value.articleTagId === 0) {
+            return alert('請選擇文章類別');
+        };
+
+        const response = await articlesAPI.editArticleDto({
+            id: editArticle.value.id,
+            title: editArticle.value.title,
+            articleTagId: editArticle.value.articleTagId,
+            date: editArticle.value.date.replaceAll('/', '-'),
+            content: editArticle.content,
+            keywords: editArticle.value.keywords,
+            narrative: editArticle.value.narrative,
+        });
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('修改成功！')
+        };
+
+        const currentId = response.data;
+
+        editFile(currentId);
+
+        getArticles();
+
+    } catch (err) {
+        console.log(err);
+    };
+};
+async function editFile(id) {
+    try {
+
+        const response = await articlesAPI.editArticleFile({
+            id,
+            file: editFiles.value[0],
+        })
+
+        if (response.status !== 200) {
+            throw new Error(response.status);
+        } else {
+            alert('修改成功！');
+        };
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+
+
 getArticles();
-
-
 </script>
 
 <style scoped lang="scss">
